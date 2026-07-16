@@ -326,7 +326,7 @@ class OpenBerg(OpenDriftSimulation):
         "sea_ice_thickness": {"fallback": 0},
         "sea_ice_x_velocity": {"fallback": 0, "important": False},
         "sea_ice_y_velocity": {"fallback": 0, "important": False},
-        "land_binary_mask": {"fallback": None},
+        "land_binary_mask": {"fallback": None, "important": True},
     }
 
 

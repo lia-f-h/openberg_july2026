@@ -3,12 +3,13 @@
 #How to run. First go to directory, then run file:
     # cd ~/work/tutorials/sources/OpenDrift/openberg_july2026
     # python3 -m openberg_july2026.scripts.sim_argparse \
-    #   --argib 'iceberg2025w' \
-    #   --argoc '[["gebco","topaz4"]]' \
+    #   --argib 'iceberg2024e' \
+    #   --argoc '[["gebco","glorys"],["gebco","topaz6","topaz5"],["gebco","glophyanfcH","glophyanfcD"]]' \
     #   --argwind '["windglophynrt"]' \
     #   --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false}' \
-    #   --argname 'testgebco' \
+    #   --argname '' \
     #   --argopenberg 'lia'
+#,["gebco","topaz5"],["gebco","topaz6","topaz5"],["gebco","glophyanfcH","glophyanfcD"],["gebco","glorys"]
 
 # --- IMPORTS ---
 from src.utils import *
@@ -49,7 +50,7 @@ for _ in range(2):
 
 # --- Read and subset tracker data ---
 ib = args.argib
-with xr.open_dataset('./openberg_july2026/input/merged_obs2.nc') as ds:
+with xr.open_dataset('./openberg_july2026/input/merged_obs3.nc') as ds:
     #obs = ds.where(ds.seed_idx, drop=True).sel(iceberg=ib)  
     obs = ds.sel(iceberg=ib) 
     obs = obs.isel(time=(obs.seed_idx==1))
@@ -98,10 +99,13 @@ for i, envinput in enumerate(input_l):
     print(i, envinput)
 
 # --- Simulation definitions ---
+n=11 #number of icebergs released on every initialisation
+
 sim_freq = str(obs.seed_freq.values)
 if sim_freq[-1]=='D': ib_duration = float(sim_freq[:-1])#in days, How long every iceberg is simulated after its individual initialisation (iceberg age)
-else: print('Provide ib_duration in days by providing the simulation frequncy in days, e.g. 3D')
-n=11 #number of icebergs released on every initialisation
+else: 
+    print('Provide ib_duration in days by providing the simulation frequncy in days, e.g. 3D')
+
 
 # --- Random or linear variation of seeding and settings ---
 # rng = np.random.default_rng(42)  # "seed" random drawing so it is the same for every simulation
@@ -118,6 +122,9 @@ times = pd.to_datetime(obs.time[idx].values).to_pydatetime().tolist()
 #---Iceberg size---
 obslength = obs.length.values if not np.isnan(obs.length.values) else 100
 randlength = obslength * logspace
+if np.any(randlength>10000): 
+    print('Iceberg too large, correct size.')
+    randlength = np.geomspace(0.1*obslength, 10000, n) #correction for too large icebergs
 randcoefwa = linspace*1.25+0.25
 randcoefwi = linspace*1+0.5
 iceberg = {'length': randlength, 
@@ -128,7 +135,10 @@ iceberg = calc_iceberg_size(iceberg) #this function adds missing iceberg sizes
 #---Add draft maximum---
 #iceberg['draft'] = np.where(iceberg['draft']<100, iceberg['draft'], 100)
 #---Add original size---
-idx0 = np.where(iceberg['length']==obslength)[0][0] #identity of  "member" that should contain observed size for every time-position-intitialisation, here due to the log spacing
+try: idx0 = np.where(iceberg['length']==obslength)[0][0]#identity of  "member" that should contain observed size for every time-position-intitialisation, here due to the log spacing
+except: 
+    idx0 = np.abs(iceberg['length'] - obslength).argmin() #if not available, find nearest and replace with original value
+    iceberg['length'][idx0] = obslength
 if not np.isnan(obs.width.values): iceberg['width'][idx0] = obs.width.values  #correct for meassured width
 if not np.isnan(obs.draft.values): iceberg['draft'][idx0] = obs.width.values  #correct for meassured width
 print(iceberg)
@@ -152,49 +162,48 @@ for envinput in input_l: #Loops through the ocean and wind input
     for envin in envinput:
         dataset_id = env_dict[envin]
         print(f"Loading dataset: {dataset_id}")
-        # try:
+        try:
+            if envin=='gebco':
+                mapping_dict = {}
+                mapping_dict['standard_name_mapping']={'sea_floor_depth_below_sea_level':'sea_floor_depth_below_sea_level',
+                         'land_binary_mask':'land_binary_mask'}
+                with xr.open_mfdataset(dataset_id) as ds_env:
+                    ds_env['sea_floor_depth_below_sea_level'] = (('lat','lon'),np.where(-ds_env.elevation.data>0,-ds_env.elevation.data,1))
+                    ds_env.sea_floor_depth_below_sea_level.attrs['standard_name']='sea_floor_depth_below_sea_level'
+                    ds_env['land_binary_mask'] = (('lat','lon'),np.where(-ds_env.elevation.data>0,0,1))
+                reader_env = Reader(ds_env,name=envin,**mapping_dict)
+                o.add_reader(reader_env)
         #     # if 'vars' in envin: #load only custom variables of dataset, does not work
         #     #     ds_env=read_cmems_custom_variables(dataset_id['id'],dataset_id['variables'])
         #     #     ds_env = ds_env.chunk({"time": 1})
         #     #     reader_env = Reader(ds_env,name=envin)
         #     #     o.add_reader(reader_env) 
-        #     if isinstance(dataset_id, str) and dataset_id.endswith('.nc'): #local files, e.g. era5
-        #         mapping_dict = {}
-        #         ds_env = xr.open_mfdataset(dataset_id)
-        #         if 'era5' in dataset_id:
-        #             ds_env = ds_env.chunk({"valid_time": 1})
-        #             mapping_dict['standard_name_mapping']={'u10': 'x_wind','v10': 'y_wind'}
-        #         if 'ensemble' not in dataset_id: 
-        #             try: ds_env = ds_env.drop_vars(['number','expver']) #if not ensemble
-        #             except: continue
-        #         if 'carra' in dataset_id: 
-        #             ds_env['longitude'] = ds_env['longitude'] - 360
-        #             mapping_dict['standard_name_mapping']={'u10': 'x_wind','v10': 'y_wind'}
-        #         if 'gebco' in envin:
-        #             mapping_dict['standard_name_mapping'] = {'elevation':'sea_floor_depth_below_sea_level'}
-        #         mappping_dict['name'] = envin
-        #         reader_env = Reader(ds_env,**mapping_dict)
-        #         o.add_reader(reader_env)
-        #     elif isinstance(dataset_id, list) and 'ensemble' in envin: #list of urls or files, eg. for topaz4 ensemble
-        #         ds_env = xr.open_mfdataset(dataset_id,
-        #                     concat_dim=xr.DataArray(members, dims='member', name='member',
-        #                     attrs={'standard_name': 'realization'}),
-        #                     combine='nested', data_vars='all', coords='all', chunks={'time': 1}) #Solution from KF!
-        #         reader_env = Reader(ds_env)
-        #         o.add_reader(reader_env)
-        #     else: o.add_readers_from_list([dataset_id]) 
-        # except Exception as e:
-        #     print(f"❌ Failed to load {dataset_id}: {e}")
-        if 'cmems' in dataset_id: o.add_readers_from_list([dataset_id]) 
-        else: 
-            mapping_dict={}
-            # mapping_dict['standard_name_mapping'] = {'elevation':'sea_floor_depth_below_sea_level'}
-            ds_env = xr.open_mfdataset(dataset_id)
-            ds_env['sea_floor_depth_below_sea_level'] = (('lat','lon'),np.where(-ds_env.elevation.data>0,-ds_env.elevation.data,1))
-            ds_env.sea_floor_depth_below_sea_level.attrs['standard_name']='sea_floor_depth_below_sea_level'
-            ds_env['land_binary_mask'] = (('lat','lon'),np.where(-ds_env.elevation.data>0,0,1))
-            reader_env = Reader(ds_env,name=envin)#,**mapping_dict)
-            o.add_reader(reader_env)
+            elif isinstance(dataset_id, str) and dataset_id.endswith('.nc'): #local files, e.g. era5
+                mapping_dict = {}
+                ds_env = xr.open_mfdataset(dataset_id)
+                if 'era5' in dataset_id:
+                    ds_env = ds_env.chunk({"valid_time": 1})
+                    mapping_dict['standard_name_mapping']={'u10': 'x_wind','v10': 'y_wind'}
+                if 'carra' in dataset_id: 
+                    ds_env['longitude'] = ds_env['longitude'] - 360
+                    mapping_dict['standard_name_mapping']={'u10': 'x_wind','v10': 'y_wind'}
+                if 'ensemble' not in dataset_id: 
+                    try: ds_env = ds_env.drop_vars(['number','expver']) #if not ensemble
+                    except: continue
+                mappping_dict['name'] = envin
+                reader_env = Reader(ds_env,**mapping_dict)
+                o.add_reader(reader_env)
+            elif isinstance(dataset_id, list) and 'ensemble' in envin: #list of urls or files, eg. for topaz4 ensemble
+                ds_env = xr.open_mfdataset(dataset_id,
+                            concat_dim=xr.DataArray(members, dims='member', name='member',
+                            attrs={'standard_name': 'realization'}),
+                            combine='nested', data_vars='all', coords='all', chunks={'time': 1}) #Solution from KF!
+                reader_env = Reader(ds_env)
+                o.add_reader(reader_env)
+            else: o.add_readers_from_list([dataset_id]) 
+        except Exception as e:
+            print(f"❌ Failed to load {dataset_id}: {e}")
+
     #---Seed icebergs---
     for lon, lat, time in zip(lons, lats, times): #Loops through initialisations of time-positions
         o.seed_elements(
@@ -204,7 +213,9 @@ for envinput in input_l: #Loops through the ocean and wind input
             number=n,
             **iceberg)
     #---Run---
-    oi = o.run(duration=timedelta(days=int(idx.size*ib_duration)), #duration from first initialisation to last termination not equal to ib age!
+    # full_duration = timedelta(days=int(idx.size*ib_duration)) #old
+    full_duration = (times[-1]-times[0])+timedelta(days=ib_duration) #new
+    oi = o.run(duration=full_duration, 
                outfile='./openberg_july2026/results/%s_%s%s.nc'%(ib,'_'.join(envinput),'_'+argname if argname!='' else ''))
     #---Plot map---
     # o.plot(fast=True,filename='./openberg_july2026/results/%s_map_%s%s.png'%(ib,'_'.join(envinput),'_'+argname if argname!='' else ''))
