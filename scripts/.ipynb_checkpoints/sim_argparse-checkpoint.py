@@ -3,9 +3,9 @@
 #How to run. First go to directory, then run file:
     # cd ~/work/tutorials/sources/OpenDrift/openberg_july2026
     # python3 -m openberg_july2026.scripts.sim_argparse \
-    #   --argib 'iceberg2021w' \
-    #   --argoc '[["gebco","topaz5"],["gebco","topaz6","topaz5"],["gebco","topaz4"],["gebco","glorys"]]' \
-    #   --argwind '["windglophynrt"]' \
+    #   --argib 'iceberg2018b' \
+    #   --argoc '[["gebco","topaz6","topaz4"],["gebco","topaz4"],["gebco","glorys"]]' \
+    #   --argwind '["windglophyre"]' \
     #   --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false}' \
     #   --argname '' \
     #   --argopenberg 'lia'
