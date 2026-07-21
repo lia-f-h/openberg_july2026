@@ -3,10 +3,10 @@
 #How to run. First go to directory, then run file:
     # cd ~/work/tutorials/sources/OpenDrift/openberg_july2026
     # python3 -m openberg_july2026.scripts.sim_argparse \
-    #   --argib 'iceberg2017b' \
-    #   --argoc '[["gebco","topaz4"],["gebco","glorys"],["gebco","nextsimre","topaz4"],]' \
+    #   --argib 'iceberg2011w2' \
+    #   --argoc '[["gebco","glorys","waverys"]]' \
     #   --argwind '["windglophyre"]' \
-    #   --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false}' \
+    #   --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": true, "stokes_drift": true}' \
     #   --argname '' \
     #   --argopenberg 'lia'
 
