@@ -50,7 +50,7 @@ for _ in range(2):
 
 # --- Read and subset tracker data ---
 ib = args.argib
-with xr.open_dataset('./openberg_july2026/input/merged_obs3.nc') as ds:
+with xr.open_dataset('./openberg_july2026/input/merged_obs4.nc') as ds:
     #obs = ds.where(ds.seed_idx, drop=True).sel(iceberg=ib)  
     obs = ds.sel(iceberg=ib) 
     obs = obs.isel(time=(obs.seed_idx==1))
