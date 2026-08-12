@@ -3,9 +3,9 @@
 #How to run. First go to directory, then run file:
     # cd ~/work/tutorials/sources/OpenDrift/openberg_july2026
     # python3 -m openberg_july2026.scripts.sim_argparse \
-    #   --argib 'iceberg2025w' \
+    #   --argib 'iceberg2017b' \
     #   --argoc '[["gebco","glorys"]]' \
-    #   --argwind '["windglophynrt"]' \
+    #   --argwind '["windglophyre"]' \
     #   --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false}' \
     #   --argname '' \
     #   --argopenberg 'lia'
@@ -50,7 +50,7 @@ for _ in range(2):
 
 # --- Read and subset tracker data ---
 ib = args.argib
-with xr.open_dataset('./openberg_july2026/input/merged_obs4.nc') as ds:
+with xr.open_dataset('./openberg_july2026/input/merged_obs10.nc') as ds:
     #obs = ds.where(ds.seed_idx, drop=True).sel(iceberg=ib)  
     obs = ds.sel(iceberg=ib) 
     obs = obs.isel(time=(obs.seed_idx==1))

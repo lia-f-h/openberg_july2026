@@ -1,2 +1,4 @@
 input/gebco_2026_n85.0_s35.0_w-80.0_e0.0.nc
-results/out_iceberg2017b_topaz4_windglophynrt_test.log
+input/coast_tree.pkl
+input/gebco_interp.joblib
+results_july/out_iceberg2017b_topaz4_windglophynrt_test.log
