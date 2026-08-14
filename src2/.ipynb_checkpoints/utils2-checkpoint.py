@@ -178,3 +178,114 @@ def read_cmems_custom_variables(dataset_id_in, variable_list_in):
         ds[v].attrs.pop("grid_mapping", None)
 
     return ds
+
+def join_ds_by_idx(file_l_in):
+    import re
+
+    def preprocess(ds):
+        source = ds.encoding["source"]
+    
+        m = re.search(r"_idx(\d+)-(\d+)", source)
+        if m is None:
+            raise ValueError(f"Could not parse idx range from {source}")
+    
+        idx_start = int(m.group(1))
+    
+        return ds.assign_coords(
+            trajectory=ds.trajectory + 11 * idx_start
+        )
+    
+    ds = xr.open_mfdataset(
+        file_l_in,
+        preprocess=preprocess,
+        combine="nested",
+        concat_dim='trajectory'
+    )
+    return ds.to_netcdf('_'.join([fs if 'idx' not in fs else 'joined' for fs in file_l_in[0].split('_')]),'w')
+    
+def file_dict_idx(file_l_in):
+    from pathlib import Path
+    import re
+
+    result = {}
+
+    for f in file_l_in:
+        stem = Path(f).stem
+
+        m = re.match(
+            r'^(.*?)_idx(\d+(?:-\d+)?)(.*)$',
+            stem
+        )
+
+        if m:
+            prefix = m.group(1)
+            idx_str = m.group(2)
+            suffix = m.group(3)  # '', '_mainrun', ...
+
+            key = f"{prefix}{suffix}.nc"
+
+            if key not in result:
+                result[key] = {"files": [], "idx": []}
+
+            if '-' in idx_str:
+                idx = [int(x) for x in idx_str.split('-')]
+            else:
+                idx = [int(idx_str), int(idx_str)]
+
+            result[key]["files"].append(f)
+            result[key]["idx"].append(idx)
+
+        else:
+            result[f] = {}
+
+    for v in result.values():
+        if "idx" in v:
+            order = sorted(
+                range(len(v["idx"])),
+                key=lambda i: v["idx"][i][0]
+            )
+            v["files"] = [v["files"][i] for i in order]
+            v["idx"] = [v["idx"][i] for i in order]
+
+    return result
+    
+# def file_dict_idx(file_l_in):
+#     from collections import defaultdict
+#     from pathlib import Path
+#     import re
+    
+#     result = {}
+    
+#     for f in file_l_in:
+#         stem = Path(f).stem
+    
+#         m = re.search(r'^(.*?)_idx(\d+(?:-\d+)?)', stem)
+    
+#         if m:
+#             # key = f.split('_idx')[0]  # full path prefix
+#             key = f.split('_idx')[0] + '.nc'
+    
+#             if key not in result:
+#                 result[key] = {"files": [], "idx": []}
+    
+#             idx_str = m.group(2)
+    
+#             if '-' in idx_str:
+#                 idx = [int(x) for x in idx_str.split('-')]
+#             else:
+#                 idx = [int(idx_str), int(idx_str)]
+    
+#             result[key]["files"].append(f)
+#             result[key]["idx"].append(idx)
+    
+#         else:
+#             result[f] = {}
+#     for v in result.values():
+#         if "idx" in v:
+#             order = sorted(
+#                 range(len(v["idx"])),
+#                 key=lambda i: v["idx"][i][0]
+#             )
+#             v["files"] = [v["files"][i] for i in order]
+#             v["idx"] = [v["idx"][i] for i in order]
+#     return result
