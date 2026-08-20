@@ -3,11 +3,13 @@
 #How to run. First go to directory, then run file:
     # cd ~/work/tutorials/sources/OpenDrift/openberg_july2026
 # python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2018b'       --argoc '[["gebco","glorys"],["gebco","topaz4"]]'       --argwind '["windglophyre"]'       --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false, "vertical_profile": false}'       --argname ''       --argopenberg 'lia' --argidx '[[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10]]' --argmainrun 1
+# python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2026e'       --argoc '[["gebco","topaz5"],["gebco","topaz6","topaz5"]]'       --argwind '["windglophynrt"]'  --argobs './openberg_july2026/input/merged_obs_iceberg2026e_3D.nc' --argname 'radius' --argradius 1000 --argidx '[[30,36]]'
 
 
 # --- IMPORTS ---
 from src.utils import *
 from openberg_july2026.src2.utils2 import *
+from openberg_july2026.src2.utils0 import env_dict
 from opendrift.readers.reader_netCDF_CF_generic import Reader    
 import gc
 import argparse
@@ -28,6 +30,9 @@ parser.add_argument("--argidx", type=json.loads, required=False, default=[],
                     help="LIst of range of seeding time-positions,e .g. [[0,1] for seeding rounds 0 to (incl.) 1")
 # parser.add_argument("--argmainrun", type=bool, default= False, help='False= n icebergs with varied coef, size and radius, True= no variations')
 parser.add_argument("--argmainrun", type=int, default=0, help='0= n icebergs with varied coef, size and radius, 1= no variations')
+parser.add_argument("--argobs", type=str, default='./openberg_july2026/input/merged_obs10.nc', help='File with iceberg observations')
+parser.add_argument("--argradius", type=int, default=3125, help='Seeding radius in m')
+
 args = parser.parse_args()
 argdrift = args.argdrift
 argname = args.argname
@@ -44,47 +49,16 @@ print('Openberg.py used from ',args.argopenberg)
 oc_in = args.argoc 
 wind_in = args.argwind
 idxargs = args.argidx 
+# --- More Arguments
 idx_l = [np.arange(idx_i[0],idx_i[1]+1,1) for idx_i in idxargs]
 mainrun = args.argmainrun
-print('Arguments: ',oc_in,wind_in,argdrift,idx_l,mainrun)
+argobs = args.argobs
+argradius = args.argradius
+print('Arguments: ',argobs,argradius,oc_in,wind_in,argdrift,idx_l,mainrun)
 
 # --- Clean up ---
 for _ in range(2):
     gc.collect()
-
-# --- Dictionary of available environmental input datasets ---
-env_dict = {
-    # --- Ocean ---
-    'topaz4': 'cmems_mod_arc_phy_my_topaz4_P1D-m',
-    'topaz4-ensemble':['https://thredds.met.no/thredds/dodsC/accibergt42/topaz4_be_mem0%s.ncml'%membnr for membnr in [('0'+str(memb)) 
-                        if memb<10 else str(memb) for memb in range(1,11)]],
-                        #find under:'https://thredds.met.no/thredds/catalog/accibergt42/catalog.html',
-    'topaz5': 'cmems_mod_arc_phy_anfc_6km_detided_PT1H-i',
-    'topaz5-ensemble': ['https://thredds.met.no/thredds/dodsC/accibergt5/topaz5_be_mem0%s.ncml'%membnr for membnr in [('0'+str(memb)) 
-                        if memb<10 else str(memb) for memb in range(1,11)]],                      
-                       #find under: https://thredds.met.no/thredds/catalog/accibergt5/catalog.html',
-    'topaz6': 'https://thredds.met.no/thredds/dodsC/cmems/topaz6/dataset-topaz6-arc-15min-3km-be.ncml', 
-    'topaz6-lowres': 'dataset-topaz6-arc-15min-3km-be',
-    'glophyanfcH': 'cmems_mod_glo_phy_anfc_0.083deg_PT1H-m', #Global anfc (mercator), hourly variables
-    'glophyanfcD': 'cmems_mod_glo_phy_anfc_0.083deg_P1D-m', #daily variables (sea ice)
-    'glorys': 'cmems_mod_glo_phy_my_0.083deg_P1D-m',
-    # --- Sea ice ---
-    'nextsimanfc':'cmems_mod_arc_phy_anfc_nextsim_hm',
-    'nextsimre':'cmems_mod_arc_phy_my_nextsim_P1D-m',
-    # --- Wave ---
-    'arcmfcwam':'dataset-wam-arctic-1hr3km-be',
-    'arcmfcwam_vars':{'id':"dataset-wam-arctic-1hr3km-be",'variables':["VHM0","VMDR","VSDX","VSDY"]},
-    'arcmfcwamre':'cmems_mod_arc_wav_my_3km_PT1H-i',
-    'mfwam':'cmems_mod_glo_wav_anfc_0.083deg_PT3H-i',
-    'waverys':'cmems_mod_glo_wav_my_0.2deg_PT3H-i',
-    # --- Wind ---
-    'windglophyre':'cmems_obs-wind_glo_phy_my_l4_0.125deg_PT1H', #availability; 2007-2026
-    'windglophynrt':'cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H', #availability: 2024-2026
-    'era5':'', #Download
-    'carra2': '', #Download
-    # --- Bathymetry---
-    'gebco':'./openberg_july2026/input/gebco_2026_n85.0_s35.0_w-80.0_e0.0.nc'}
-
 
 # --- Combintaions of inputs ---
 if np.logical_and(wind_in!=[],oc_in!=[]): input_l = [(oc if isinstance(oc, list) else [oc]) + [wi] for wi in wind_in for oc in oc_in ] 
@@ -97,7 +71,7 @@ for i, envinput in enumerate(input_l):
 
 # --- Read and subset tracker data ---
 ib = args.argib
-with xr.open_dataset('./openberg_july2026/input/merged_obs10.nc') as ds:
+with xr.open_dataset(argobs) as ds:
     #obs = ds.where(ds.seed_idx, drop=True).sel(iceberg=ib)  
     obs = ds.sel(iceberg=ib) 
     obs = obs.isel(time=(obs.seed_idx==1))
@@ -135,7 +109,7 @@ if mainrun==True:
 else:
     iceberg = {'length': randlength, 
            'water_form_drag_coef': randcoefwa, 'wind_form_drag_coef': randcoefwi,
-           'radius':3125}
+           'radius':argradius}
 #---Size correction---
 iceberg = calc_iceberg_size(iceberg) #this function adds missing iceberg sizes
 #---Add draft maximum---

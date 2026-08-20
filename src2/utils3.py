@@ -1,45 +1,5 @@
 from src.utils import *
 
-legenddict_full = {       
-                  'WINDGLOPHYRE':{'col':'lightcoral','alpha':1,'zo':10},
-                  'WINDGLOPHYNRT':{'col':'lightcoral','alpha':1,'zo':10},
-                  'ERA5':{'col':'firebrick','alpha':1,'zo':10},
-                  'ICEBERG':{'col':'k','alpha':1,'zo':60},
-                'GLORYS':{'col':'darkolivegreen','alpha':1,'zo':20},
-                'GLOPHYANFCH':{'col':'darkseagreen','alpha':1,'zo':21},
-                'GLOPHYANFCD':{'col':'darkseagreen','alpha':1,'zo':21},
-              'TOPAZ4':{'col':'darkslateblue','alpha':1,'zo':22},
-              'TOPAZ5':{'col':'cornflowerblue','alpha':1,'zo':23},
-              'TOPAZ6':{'col':'turquoise','alpha':1,'zo':24},
-              'WAVERYS':{'col':'deeppink','alpha':1,'zo':30},
-              'MFWAM':{'col':'deeppink','alpha':0.7,'zo':31},
-              'ARCMFCWAM':{'col':'deeppink','alpha':0.4,'zo':32},
-                'NEXTSIMRE':{'col':'plum','alpha':1,'zo':40},
-                'NEXTSIMANFC':{'col':'plum','alpha':1,'zo':40},
-                'SATSI':{'col':'purple','alpha':1,'zo':41},
-                'mainrun':{'col':'w','alpha':1,'lsty':'--','zo':50},
-
-             }
-
-dict_analysis_period = {
-    'iceberg2017b':{
-        0:slice('2017-10-24','2018-03-06'),
-        1:slice('2018-03-07','2018-08-25'),
-        'seaice':slice('2017-10-24','2018-06-01'),
-        'noseaice':slice('2018-06-01','2018-08-25'),    
-        'full':slice('2017-10-24','2018-08-25')},    
-    'iceberg2018b':{
-        'full':slice('2018-12-11', '2019-06-18'),    
-        0:slice('2018-12-11','2019-03-20' ),
-        1:slice('2019-03-21','2019-06-18'),
-        'seaice':slice('2018-12-11','2019-05-29'),
-        'noseaice':slice('2019-05-29','2019-06-18'),
-        'wave':slice('2019-04-30','2019-06-18')
-        }
-    }
-dict_traj = {#only added when restrictions are in place
-    # 'iceberg2017b':{'iceberg2017b_gebco_topaz4_windglophyre':np.arange(187)}#187
-}
 
 def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
                 save=False, title=False,
