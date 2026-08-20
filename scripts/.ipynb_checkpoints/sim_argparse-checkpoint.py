@@ -2,8 +2,7 @@
 
 #How to run. First go to directory, then run file:
     # cd ~/work/tutorials/sources/OpenDrift/openberg_july2026
-# python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2017b'       --argoc '[["gebco","glorys"]]'       --argwind '["windglophyre"]'       --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false, "vertical_profile": true}'       --argname 'profile'       --argopenberg 'lia' --argidx '[[12,12]' --argmainrun False
-#ATTENTION! argmainrun  must be captitalised!!
+# python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2018b'       --argoc '[["gebco","glorys"],["gebco","topaz4"]]'       --argwind '["windglophyre"]'       --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false, "vertical_profile": false}'       --argname ''       --argopenberg 'lia' --argidx '[[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10]]' --argmainrun 1
 
 
 # --- IMPORTS ---

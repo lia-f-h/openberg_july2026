@@ -201,7 +201,7 @@ def join_ds_by_idx(file_l_in):
         combine="nested",
         concat_dim='trajectory'
     )
-    return ds.to_netcdf('_'.join([fs if 'idx' not in fs else 'joined' for fs in file_l_in[0].split('_')]),'w')
+    return ds.to_netcdf('_'.join([fs if 'idx' not in fs else 'joined' for fs in file_l_in[0].split('_')])+'.nc','w')
     
 def file_dict_idx(file_l_in):
     from pathlib import Path

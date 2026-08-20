@@ -1,22 +1,23 @@
 from src.utils import *
 
 legenddict_full = {       
-                  'WINDGLOPHYRE':{'col':'lightcoral','alpha':1},
-              'WINDGLOPHYNRT':{'col':'lightcoral','alpha':1},
-              'ERA5':{'col':'firebrick','alpha':1},
-              'ICEBERG':{'col':'k','alpha':1},
-            'GLORYS':{'col':'darkolivegreen','alpha':1},
-            'GLOPHYANFCH':{'col':'darkseagreen','alpha':1},
-            'GLOPHYANFCD':{'col':'darkseagreen','alpha':1},
-              'TOPAZ4':{'col':'darkslateblue','alpha':1},
-              'TOPAZ5':{'col':'cornflowerblue','alpha':1},
-              'TOPAZ6+5':{'col':'turquoise','alpha':1},
-              'WAVERYS (alpha=1)':{'col':'deeppink','alpha':1},
-              'MFWAM (alpha=0.7)':{'col':'deeppink','alpha':0.7},
-              'ARCMFCWAM (alpha=0.4)':{'col':'deeppink','alpha':0.4},
-                'NEXTSIMRE':{'col':'plum','alpha':1},
-                'NEXTSIMANFC':{'col':'plum','alpha':1},
-                'SATSI':{'col':'purple','alpha':1},
+                  'WINDGLOPHYRE':{'col':'lightcoral','alpha':1,'zo':10},
+                  'WINDGLOPHYNRT':{'col':'lightcoral','alpha':1,'zo':10},
+                  'ERA5':{'col':'firebrick','alpha':1,'zo':10},
+                  'ICEBERG':{'col':'k','alpha':1,'zo':60},
+                'GLORYS':{'col':'darkolivegreen','alpha':1,'zo':20},
+                'GLOPHYANFCH':{'col':'darkseagreen','alpha':1,'zo':21},
+                'GLOPHYANFCD':{'col':'darkseagreen','alpha':1,'zo':21},
+              'TOPAZ4':{'col':'darkslateblue','alpha':1,'zo':22},
+              'TOPAZ5':{'col':'cornflowerblue','alpha':1,'zo':23},
+              'TOPAZ6':{'col':'turquoise','alpha':1,'zo':24},
+              'WAVERYS':{'col':'deeppink','alpha':1,'zo':30},
+              'MFWAM':{'col':'deeppink','alpha':0.7,'zo':31},
+              'ARCMFCWAM':{'col':'deeppink','alpha':0.4,'zo':32},
+                'NEXTSIMRE':{'col':'plum','alpha':1,'zo':40},
+                'NEXTSIMANFC':{'col':'plum','alpha':1,'zo':40},
+                'SATSI':{'col':'purple','alpha':1,'zo':41},
+                'mainrun':{'col':'w','alpha':1,'lsty':'--','zo':50},
 
              }
 
@@ -26,7 +27,15 @@ dict_analysis_period = {
         1:slice('2018-03-07','2018-08-25'),
         'seaice':slice('2017-10-24','2018-06-01'),
         'noseaice':slice('2018-06-01','2018-08-25'),    
-    }
+        'full':slice('2017-10-24','2018-08-25')},    
+    'iceberg2018b':{
+        'full':slice('2018-12-11', '2019-06-18'),    
+        0:slice('2018-12-11','2019-03-20' ),
+        1:slice('2019-03-21','2019-06-18'),
+        'seaice':slice('2018-12-11','2019-05-29'),
+        'noseaice':slice('2019-05-29','2019-06-18'),
+        'wave':slice('2019-04-30','2019-06-18')
+        }
     }
 dict_traj = {#only added when restrictions are in place
     # 'iceberg2017b':{'iceberg2017b_gebco_topaz4_windglophyre':np.arange(187)}#187
@@ -136,6 +145,7 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
         levels=levels,
         cmap="viridis",
         alpha=0.9,
+        zorder=0
     )
     contour = ax.contour(
         X,
@@ -144,12 +154,14 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
         levels=levels,
         colors="k",
         linewidths=(0.5,),
+        zorder=0
     )
     clabels = ax.clabel(
         contour,
         inline=True,
         fontsize=12,
         fmt={level: f"{int(p*100)}%" for level, p in zip(levels, percentages)},
+        zorder=0
     )
     ## Customize clabels
     for txt in clabels:
@@ -159,7 +171,8 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
         txt.set_color("black")
     
     # ax.scatter(
-    #     x, y, alpha=0.5, marker="v", color='w', edgecolor="k", label="6-hourly Data points \nof simulations using input from"
+    #     x, y, alpha=0.5, marker="v", color='w', edgecolor="k", label="6-hourly Data points \nof simulations using input from",
+    # zorder=1
     # )
     
     
@@ -220,8 +233,8 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
                                                 np.nanpercentile(THETA, 90) - np.nanpercentile(THETA, 10))] #range as in max-min and IQR range (from 90 to 10%)
     
         ax.scatter(
-            x, y, alpha=legenddict[run]['alpha'], marker="v", color=col_run, edgecolor="k", 
-            label=f"{run.item()[19:-3]} \nmean (R={np.round(r_avg_insiders,1)},theta={np.round(theta_avg_insiders,1) if theta_avg_insiders<180 else np.round(theta_avg_insiders-360,1)}°)"
+            x, y, alpha=legenddict[run]['alpha'], marker="v", color=col_run, edgecolor="k", zorder=legenddict[run]['zo'],
+            label=f"{run.item()[19:-3]} \nmean (R={np.round(r_avg_insiders,1)},theta={np.round(theta_avg_insiders,1) if theta_avg_insiders<180 else np.round(theta_avg_insiders-360,1)}°)",
         )
         ax.scatter(
             x_insiders,
@@ -231,7 +244,7 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
             c=col_run,
             alpha=legenddict[run]['alpha'],edgecolor='w',
             # label=f"Mean (R={np.round(r_avg_insiders,1)},theta={np.round(theta_avg_insiders,1) if theta_avg_insiders<180 else np.round(theta_avg_insiders-360,1)}°)",
-            zorder=30,
+            zorder=legenddict[run]['zo']+130,
         )
     
         ax.plot(
@@ -239,6 +252,7 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
             np.tan(np.pi / 2 - np.deg2rad(theta_avg_insiders)) * np.linspace(-3, 3, 100),
             color=col_run,alpha=legenddict[run]['alpha'],
             linestyle="--",
+            zorder=legenddict[run]['zo'],
             # label=f"average deviation : {np.round(theta_avg_insiders,1) if theta_avg_insiders<180 else np.round(theta_avg_insiders-360,1)}°",
         )
         # print(inputdata,f"Mean (R={np.round(r_avg_insiders,1)},theta={np.round(theta_avg_insiders,1) if theta_avg_insiders<180 else np.round(theta_avg_insiders-360,1)}°)")
@@ -253,7 +267,7 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
             facecolor='w',edgecolor='k',
             # label=f"mean without ouliers (R={np.round(r_avg_insiders,1)},theta={np.round(theta_avg_insiders,1) if theta_avg_insiders<180 else np.round(theta_avg_insiders-360,1)}°)",
             label=f"Mean error distance (R={np.round(r_avg_insiders_all,1)})",
-            zorder=30,
+           zorder=200,
         )
         # print('all',f"Mean error velocity (R={np.round(r_avg_insiders_all,1)}) & direction (theta={np.round(theta_avg_insiders_all,1) if theta_avg_insiders_all<180 else np.round(theta_avg_insiders_all-360,1)}°) (all input)")
         ax.plot(
@@ -261,18 +275,19 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
             np.tan(np.pi / 2 - np.deg2rad(theta_avg_insiders_all)) * np.linspace(-3, 3, 100),
             color="k",
             linestyle="--",
+            zorder=200,
             label=f"Mean error direction (theta={np.round(theta_avg_insiders_all,1) if theta_avg_insiders_all<180 else np.round(theta_avg_insiders_all-360,1)}°)" #f"average deviation : {np.round(theta_avg_insiders,1) if theta_avg_insiders<180 else np.round(theta_avg_insiders-360,1)}°",
         )
         
     #other plots things
-    ax.scatter(0, 1, marker="x", s=200, c="r", label="Target", zorder=20)
-    ax.hlines(0, xmin=-5, xmax=5, linestyle=":", color="r", alpha=0.5)
+    ax.scatter(0, 1, marker="x", s=200, c="r", label="Target", zorder=300)
+    ax.hlines(0, xmin=-5, xmax=5, linestyle=":", color="r", alpha=0.5, zorder=300)
     ax.set_xlim([-2.5, 2.5])
     ax.set_ylim([-2.5, 2.5])
     # ax.set_xlim([-3.5, 3.5])
     # ax.set_ylim([-3.5, 3.5])
     circle1 = plt.Circle(
-        (0, 0), 1, edgecolor="r", linestyle="--", fc=None, fill=False, zorder=30
+        (0, 0), 1, edgecolor="r", linestyle="--", fc=None, fill=False, zorder=300
     )
     ax.add_patch(circle1)
     plt.gca().set_aspect(
