@@ -17,7 +17,9 @@ legenddict_full = {
                 'NEXTSIMRE':{'col':'plum','alpha':1,'zo':40},
                 'NEXTSIMANFC':{'col':'plum','alpha':1,'zo':40},
                 'SATSI':{'col':'purple','alpha':1,'zo':41},
-                'mainrun':{'col':'w','alpha':1,'lsty':'--','zo':50},
+                # 'mainrun':{'col':'grey','alpha':1,'lsty':':','zo':50},
+                'debris':{'col':'grey','alpha':0.3,'lsty':':','zo':9},
+    
 
              }
 
