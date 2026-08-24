@@ -4,7 +4,8 @@
     # cd ~/work/tutorials/sources/OpenDrift/openberg_july2026
 # python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2018b'       --argoc '[["gebco","glorys"],["gebco","topaz4"]]'       --argwind '["windglophyre"]'       --argdrift '{"wind_drag": true, "sea_ice_drag": true,  "wave_rad": false, "stokes_drift": false, "vertical_profile": false}'       --argname ''       --argopenberg 'lia' --argidx '[[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10]]' --argmainrun 1
 # python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2026e'       --argoc '[["gebco","topaz5"]]'       --argwind '["windglophynrt"]'  --argobs './openberg_july2026/input/merged_obs_iceberg2026e_1D.nc' --argradius 10000 --argidx '[[30,36]]' --argiceberg '{"n":20,"length":50,"maxdraft":150}' --argname 'debris_radius10000_n20_l50_maxdraft' 
-
+# python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2026e'       --argoc '[["gebco","topaz5"]]'       --argwind '["windglophynrt"]'  --argobs './openberg_july2026/input/merged_obs_iceberg2026e_1D.nc' --argradius 10000 --argidx '[[29,29]]' --argiceberg '{"n":20,"length":50,"maxdraft":150}' --argleadtime 55 --argname 'debris_radius10000_n20_l50_maxdraft' 
+# python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2026e'       --argoc '[["gebco","topaz5"]]'       --argwind '["windglophynrt"]'  --argobs './openberg_july2026/input/merged_obs_iceberg2026e_1D.nc' --argmainrun 1 --argidx '[[29,29]]' --argiceberg '{"n":1,"length":5000, "width":3000, "draft": 100}' --argleadtime 55 --argtimestep 60*15 --argname 'longrun_1Jul_timestep15min'
 
 # --- IMPORTS ---
 from src.utils import *
@@ -34,6 +35,7 @@ parser.add_argument("--argleadtime", type=int, default=None, help='Lead time in 
 #                     help="Range of seeding time-positions,e .g. 0,1 for seeding rounds 0 to (incl.) 1")
 parser.add_argument("--argidx", type=json.loads, required=False, default=[],
                     help="LIst of range of seeding time-positions,e .g. [[0,1] for seeding rounds 0 to (incl.) 1")
+parser.add_argument("--argtimestep", type=int, default=3600, help='Simulation time steps in seconds')
 
 parser.add_argument("--argname", type=str, help='str to be added to filename (optional)', default='')
 
@@ -59,8 +61,9 @@ mainrun = args.argmainrun
 argobs = args.argobs
 argradius = args.argradius
 leadtime = args.argleadtime
+argtimestep = args.argtimestep
 argiceberg = args.argiceberg
-print('Arguments: ',argobs,mainrun,argiceberg,argradius,leadtime,idx_l,oc_in,wind_in,argdrift)
+print('Arguments: ',argobs,mainrun,argiceberg,argradius,leadtime,argtimestep,idx_l,oc_in,wind_in,argdrift)
 
 # --- Clean up ---
 for _ in range(2):
@@ -223,8 +226,12 @@ for envinput in input_l: #Loops through the ocean and wind input
         #---Run---
         # full_duration = timedelta(days=int(idx.size*ib_duration)) #old
         full_duration = (times[-1]-times[0])+timedelta(days=ib_duration) #new
-        oi = o.run(duration=full_duration, 
-                   outfile='./openberg_july2026/results/%s_%s%s%s%s%s.nc'%(ib,'_'.join(envinput),'_idx%s-%s'%(idx[0],idx[-1]) if idxargs!=[] else '','_lead%s'%leadtime if leadtime!=None else '','_mainrun' if mainrun==True else '', '_'+argname if argname!='' else ''))
+        run_dict = {'duration':full_duration, 'outfile':'./openberg_july2026/results/%s_%s%s%s%s%s.nc'%(ib,'_'.join(envinput),'_idx%s-%s'%(idx[0],idx[-1]) if idxargs!=[] else '','_lead%s'%leadtime if leadtime!=None else '','_mainrun' if mainrun==True else '', '_'+argname if argname!='' else ''),
+                   }
+        if argtimestep!=3600: 
+            run_dict['time_step']=argtimestep
+            run_dict['time_step_output']=3600
+        oi = o.run(**run_dict)
         #---Plot map---
         # o.plot(fast=True,filename='./openberg_july2026/results/%s_map_%s%s.png'%(ib,'_'.join(envinput),'_'+argname if argname!='' else ''))
         # --- collect left over data ---
