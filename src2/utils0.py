@@ -16,7 +16,7 @@ legenddict_full = {
               'ARCMFCWAM':{'col':'deeppink','alpha':0.4,'zo':32},
                 'NEXTSIMRE':{'col':'plum','alpha':1,'zo':40},
                 'NEXTSIMANFC':{'col':'plum','alpha':1,'zo':40},
-                'SATSI':{'col':'purple','alpha':1,'zo':41},
+                'SISAT':{'col':'purple','alpha':1,'zo':41},
                 # 'mainrun':{'col':'grey','alpha':1,'lsty':':','zo':50},
                 'debris':{'col':'grey','alpha':0.3,'lsty':':','zo':9},
     
@@ -66,10 +66,12 @@ env_dict = {
     # --- Sea ice ---
     'nextsimanfc':'cmems_mod_arc_phy_anfc_nextsim_hm',
     'nextsimre':'cmems_mod_arc_phy_my_nextsim_P1D-m',
+    'sisatdtu':'cmems_obs-si_glo_phy-drift-north_my_l4_P1D-m',
+    'sisatifremer':'CERSAT-GLO-SEAICE_3DAYS_DRIFT_ASCAT_SSMI_MERGED_RAN-OBS_FULL_TIME_SERIE',#CERSAT-GLO-SEAICE_3DAYS_DRIFT_ASCAT_RAN-OBS_FULL_TIME_SERIE
     # --- Wave ---
     'arcmfcwam':'dataset-wam-arctic-1hr3km-be',
     'arcmfcwam_vars':{'id':"dataset-wam-arctic-1hr3km-be",'variables':["VHM0","VMDR","VSDX","VSDY"]},
-    'arcmfcwamre':'cmems_mod_arc_wav_my_3km_PT1H-i',
+    'arcmfcwamre':'https://thredds.met.no/thredds/dodsC/cmems/hindcastmywave3km/dataset-wam-arctic-1hr3km-be.ncml',#'cmems_mod_arc_wav_my_3km_PT1H-i',
     'mfwam':'cmems_mod_glo_wav_anfc_0.083deg_PT3H-i',
     'waverys':'cmems_mod_glo_wav_my_0.2deg_PT3H-i',
     # --- Wind ---
