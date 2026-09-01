@@ -201,9 +201,10 @@ def join_ds_by_idx(file_l_in):
         combine="nested",
         concat_dim='trajectory'
     )
-    outname =  '_'.join([fs if 'idx' not in fs else '' for fs in file_l_in[0].split('_')]).replace('.nc','_joined.nc') 
-    try: outname.replace('__','_')
-    except: pass
+    outname =  '_'.join([fs if 'idx' not in fs else '' for fs in file_l_in[0].split('_')])
+    outname = outname.replace('.nc','_joined.nc') if '.nc' in outname else outname+'_joined.nc'
+    outname = outname.replace('__','_') if '__' in outname else outname
+    print(outname)
     return  ds.to_netcdf(outname,'w')
     # return ds.to_netcdf('_'.join([fs if 'idx' not in fs else 'joined' for fs in file_l_in[0].split('_')]),'w')
     
