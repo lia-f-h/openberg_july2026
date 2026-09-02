@@ -119,8 +119,10 @@ randlength = obslength * logspace
 if np.any(randlength>10000): 
     print('Iceberg too large, correct size.')
     randlength = np.geomspace(0.1*obslength, 10000, n) #correction for too large icebergs
-randcoefwa = linspace*1.25+0.25
-randcoefwi = linspace*1+0.5
+# randcoefwa = linspace*1.25+0.25
+# randcoefwi = linspace*1+0.5
+randcoefwa = (0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875, 1.   , 1.125, 1.25 , 1.375, 1.5)
+randcoefwi = (0.5  , 1.4  , 0.7  , 1.2  , 0.9  , 1.1  , 1.   , 0.8  , 1.3  , 0.6  , 1.5)
 if mainrun==True: #mainrun means no variations
     iceberg = {'length': [obslength,], 
            'water_form_drag_coef': [0.25,], 'wind_form_drag_coef': [0.8,],
@@ -129,7 +131,8 @@ else: #variations
     iceberg = {'length': randlength, 
            'water_form_drag_coef': randcoefwa, 'wind_form_drag_coef': randcoefwi,
            'radius':argradius}
-
+if 'water_form_drag_coef' in argiceberg: iceberg['water_form_drag_coef'] = argiceberg['water_form_drag_coef']
+if 'wind_form_drag_coef' in argiceberg: iceberg['wind_form_drag_coef'] = argiceberg['wind_form_drag_coef']
 #---Size correction---
 iceberg = calc_iceberg_size(iceberg) #this function adds missing iceberg sizes
 #---Add draft maximum---
