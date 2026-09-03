@@ -13,7 +13,7 @@ legenddict_full = {
               'TOPAZ6':{'col':'turquoise','alpha':1,'zo':24},
               'WAVERYS':{'col':'deeppink','alpha':1,'zo':30},
               'MFWAM':{'col':'deeppink','alpha':0.7,'zo':31},
-              'ARCMFCWAM':{'col':'deeppink','alpha':0.4,'zo':32},
+              'ARCMFCWAM':{'col':'pink','alpha':1,'zo':32},
                 'NEXTSIMRE':{'col':'plum','alpha':1,'zo':40},
                 'NEXTSIMANFC':{'col':'plum','alpha':1,'zo':40},
                 'SISAT':{'col':'purple','alpha':1,'zo':41},
@@ -50,8 +50,13 @@ dict_analysis_period = {
         'iceberg2021w':    {
         'full': slice('2021-09-19','2021-10-13'),
         1:slice('2021-09-19','2024-10-02'),
-        2:slice('2021-10-03','2024-10-13'),
-},
+        2:slice('2021-10-03','2024-10-13'),},
+        'iceberg2011w1':    {
+        'full': slice('2011-11-12','2012-02-11'),
+        1:slice('2011-11-12','2011-12-21'),
+        2:slice('2011-12-22','2012-02-11'),},
+        'iceberg2011w2':    {
+        'full': slice('2011-09-26','2011-11-23'),}
     }
 dict_traj = {#only added when restrictions are in place
     # 'iceberg2017b':{'iceberg2017b_gebco_topaz4_windglophyre':np.arange(187)}#187
