@@ -56,7 +56,11 @@ dict_analysis_period = {
         1:slice('2011-11-12','2011-12-21'),
         2:slice('2011-12-22','2012-02-11'),},
         'iceberg2011w2':    {
-        'full': slice('2011-09-26','2011-11-23'),}
+        'full': slice('2011-09-26','2011-11-23'),},
+        'iceberg2025w':{'full':slice('2025-10-11', '2025-12-10'),
+                    'I':slice('2025-10-11','2025-10-23'), 
+                    'II':slice('2025-10-24','2025-11-22'), 
+                    'III':slice('2025-11-23','2025-12-10') }
     }
 dict_traj = {#only added when restrictions are in place
     # 'iceberg2017b':{'iceberg2017b_gebco_topaz4_windglophyre':np.arange(187)}#187
