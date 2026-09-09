@@ -116,9 +116,9 @@ obswidth =  argiceberg['width'] if 'width' in argiceberg else obs.width.values
 obsdraft =  argiceberg['draft'] if 'draft' in argiceberg else obs.draft.values
     #variability
 randlength = obslength * logspace
-if np.any(randlength>10000): 
-    print('Iceberg too large, correct size.')
-    randlength = np.geomspace(0.1*obslength, 10000, n) #correction for too large icebergs
+# if np.any(randlength>10000): 
+#     print('Iceberg too large, correct size.')
+#     randlength = np.geomspace(0.1*obslength, 10000, n) #correction for too large icebergs
 # randcoefwa = linspace*1.25+0.25
 # randcoefwi = linspace*1+0.5
 randcoefwa = (0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875, 1.   , 1.125, 1.25 , 1.375, 1.5)
