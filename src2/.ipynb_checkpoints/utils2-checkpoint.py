@@ -20,11 +20,12 @@ from src.utils import *
 # import os
 # import pandas as pd
 # import time
-    
+
 def calc_iceberg_size(iceberg_in):
     """
     Estimate missing iceberg properties (width, draft, sail)
-    using empirical relationships based on length.
+    using empirical relationships based on length, but corrected for larger icebergs.
+    It is still recommended to give maxdraft
     
     Parameters
     ----------
@@ -45,10 +46,14 @@ def calc_iceberg_size(iceberg_in):
 
     # --- Estimate width ---
     if 'width' not in iceberg_out:
-        iceberg_out['width'] = 0.7 * lengths * np.exp(-0.00062 * lengths)
+        # iceberg_out['width'] = 0.7 * lengths * np.exp(-0.00062 * lengths) 
+        # iceberg_out['width'][lengths>1600] = 0.8 * lengths[lengths>1600]
+        iceberg_out['width'] = 0.7 * lengths 
 
     # --- Estimate height ---
     height = 0.4 * lengths * np.exp(-0.00062 * lengths)
+    height[lengths>1600] = 240
+    # iceberg_out['height'] = height
 
     # Physical constants (kg/m³)
     rho_i = 900   # ice density
@@ -78,6 +83,122 @@ def calc_iceberg_size(iceberg_in):
     # If both exist, leave as is
 
     return iceberg_out
+    
+# def calc_iceberg_size(iceberg_in):
+#     """
+#     Estimate missing iceberg properties (width, draft, sail)
+#     NOT using empirical relationships, but: based on length.
+    
+#     Parameters
+#     ----------
+#     iceberg : dict
+#         Dictionary containing iceberg properties. Must include 'length'.
+    
+#     Returns
+#     -------
+#     dict
+#         Updated iceberg dictionary with estimated values filled in.
+#     """
+#     iceberg_out = iceberg_in.copy()
+
+#     if 'length' not in iceberg_out:
+#         raise ValueError("Input must contain 'length'.")
+
+#     lengths = np.array(iceberg_out['length'])
+
+#     # --- Estimate width ---
+#     if 'width' not in iceberg_out:
+#         iceberg_out['width'] = 0.7 * lengths * np.exp(-0.00062 * lengths)
+
+#     # --- Estimate height ---
+#     height = 0.4 * lengths * np.exp(-0.00062 * lengths)
+
+#     # Physical constants (kg/m³)
+#     rho_i = 900   # ice density
+#     rho_w = 1027  # seawater density
+
+#     # Fraction below and above water
+#     frac_draft = rho_i / rho_w
+#     frac_sail = 1 - frac_draft
+
+#     # --- Handle draft and sail ---
+#     has_draft = 'draft' in iceberg_out
+#     has_sail = 'sail' in iceberg_out
+
+#     if not has_draft and not has_sail:
+#         # Compute both directly
+#         iceberg_out['draft'] = height * frac_draft
+#         iceberg_out['sail'] = height * frac_sail
+
+#     elif has_draft and not has_sail:
+#         # Compute sail from draft
+#         iceberg_out['sail'] = iceberg_out['draft'] * (frac_sail / frac_draft)
+
+#     elif has_sail and not has_draft:
+#         # Compute draft from sail
+#         iceberg_out['draft'] = iceberg_out['sail'] * (frac_draft / frac_sail)
+
+#     # If both exist, leave as is
+
+#     return iceberg_out
+    
+# def calc_iceberg_size(iceberg_in):
+#     """
+#     Estimate missing iceberg properties (width, draft, sail)
+#     using empirical relationships based on length.
+    
+#     Parameters
+#     ----------
+#     iceberg : dict
+#         Dictionary containing iceberg properties. Must include 'length'.
+    
+#     Returns
+#     -------
+#     dict
+#         Updated iceberg dictionary with estimated values filled in.
+#     """
+#     iceberg_out = iceberg_in.copy()
+
+#     if 'length' not in iceberg_out:
+#         raise ValueError("Input must contain 'length'.")
+
+#     lengths = np.array(iceberg_out['length'])
+
+#     # --- Estimate width ---
+#     if 'width' not in iceberg_out:
+#         iceberg_out['width'] = 0.7 * lengths * np.exp(-0.00062 * lengths)
+
+#     # --- Estimate height ---
+#     height = 0.4 * lengths * np.exp(-0.00062 * lengths)
+
+#     # Physical constants (kg/m³)
+#     rho_i = 900   # ice density
+#     rho_w = 1027  # seawater density
+
+#     # Fraction below and above water
+#     frac_draft = rho_i / rho_w
+#     frac_sail = 1 - frac_draft
+
+#     # --- Handle draft and sail ---
+#     has_draft = 'draft' in iceberg_out
+#     has_sail = 'sail' in iceberg_out
+
+#     if not has_draft and not has_sail:
+#         # Compute both directly
+#         iceberg_out['draft'] = height * frac_draft
+#         iceberg_out['sail'] = height * frac_sail
+
+#     elif has_draft and not has_sail:
+#         # Compute sail from draft
+#         iceberg_out['sail'] = iceberg_out['draft'] * (frac_sail / frac_draft)
+
+#     elif has_sail and not has_draft:
+#         # Compute draft from sail
+#         iceberg_out['draft'] = iceberg_out['sail'] * (frac_draft / frac_sail)
+
+#     # If both exist, leave as is
+
+#     return iceberg_out
     
 # def calc_iceberg_size(iceberg_in1):
 #     '''Correct iceberg size not supplied with empirical relations before seeding iceberg.

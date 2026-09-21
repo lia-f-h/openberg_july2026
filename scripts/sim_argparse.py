@@ -7,6 +7,9 @@
 # python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2026e'       --argoc '[["gebco","topaz5"]]'       --argwind '["windglophynrt"]'  --argobs './openberg_july2026/input/merged_obs_iceberg2026e_1D.nc' --argradius 10000 --argidx '[[29,29]]' --argiceberg '{"n":20,"length":50,"maxdraft":150}' --argleadtime 55 --argname 'debris_radius10000_n20_l50_maxdraft' 
 # python3 -m openberg_july2026.scripts.sim_argparse       --argib 'iceberg2026e'       --argoc '[["gebco","topaz5"]]'       --argwind '["windglophynrt"]'  --argobs './openberg_july2026/input/merged_obs_iceberg2026e_1D.nc' --argmainrun 1 --argidx '[[29,29]]' --argiceberg '{"n":1,"length":5000, "width":3000, "draft": 100}' --argleadtime 55 --argtimestep 60*15 --argname 'longrun_1Jul_timestep15min'
 
+# python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":3000, "width":2000, "draft":100}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argmainrun 1 --argname 'testnew' 
+# python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":100, "maxdraft":150, "n":20}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argradius 10000 --argname 'testnew' 
+
 # --- IMPORTS ---
 from src.utils import *
 from openberg_july2026.src2.utils2 import *
@@ -80,10 +83,14 @@ for i, envinput in enumerate(input_l):
 
 # --- Read and subset tracker data ---
 ib = args.argib
-with xr.open_dataset(argobs) as ds:
-    #obs = ds.where(ds.seed_idx, drop=True).sel(iceberg=ib)  
-    obs = ds.sel(iceberg=ib).copy() 
-    obs = obs.isel(time=(obs.seed_idx==1))
+if argobs not in ('None','False'):
+    with xr.open_dataset(argobs) as ds:
+        #obs = ds.where(ds.seed_idx, drop=True).sel(iceberg=ib)  
+        obs = ds.sel(iceberg=ib).copy() 
+        obs = obs.isel(time=(obs.seed_idx==1))
+else: 
+    obs = {'time':np.array([argiceberg['time']]),'lat':np.array([argiceberg['lat']]),'lon':np.array([argiceberg['lon']])}
+    if 'seed_freq' in argiceberg: obs['seed_freq'] =argiceberg['seed_freq']
 
 # --- Simulation definitions ---
 #number of icebergs released on every initialisation
@@ -91,9 +98,10 @@ if mainrun==True: n=1
 elif 'n' in argiceberg: n = argiceberg['n']
 else: n=11
 
-sim_freq = str(obs.seed_freq.values)
+sim_freq = str(obs.seed_freq.values) if 'seed_freq' in obs else None
 if leadtime!=None: ib_duration = float(leadtime)
-elif sim_freq[-1]=='D': ib_duration = float(sim_freq[:-1])#in days, How long every iceberg is simulated after its individual initialisation (iceberg age)
+elif sim_freq[-1]=='D': 
+    ib_duration = float(sim_freq[:-1])#in days, How long every iceberg is simulated after its individual initialisation (iceberg age)
 else: 
     print('Provide ib_duration in days by providing the simulation frequncy in days, e.g. 3D')
 
@@ -112,8 +120,8 @@ logspace = np.geomspace(0.1, 10.0, n) #uinformely distributed in logarithmic spa
 if 'length' in argiceberg: obslength=argiceberg['length']
 elif np.isnan(obs.length.values)==False: obslength = obs.length.values
 else: obslength = 100
-obswidth =  argiceberg['width'] if 'width' in argiceberg else obs.width.values
-obsdraft =  argiceberg['draft'] if 'draft' in argiceberg else obs.draft.values
+obswidth =  argiceberg['width'] if 'width' in argiceberg else (obs.width.values if 'width' in obs else np.nan)
+obsdraft =  argiceberg['draft'] if 'draft' in argiceberg else (obs.draft.values if 'draft' in obs else np.nan)
     #variability
 randlength = obslength * logspace
 # if np.any(randlength>10000): 
@@ -121,8 +129,14 @@ randlength = obslength * logspace
 #     randlength = np.geomspace(0.1*obslength, 10000, n) #correction for too large icebergs
 # randcoefwa = linspace*1.25+0.25
 # randcoefwi = linspace*1+0.5
-randcoefwa = (0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875, 1.   , 1.125, 1.25 , 1.375, 1.5)
-randcoefwi = (0.5  , 1.4  , 0.7  , 1.2  , 0.9  , 1.1  , 1.   , 0.8  , 1.3  , 0.6  , 1.5)
+if n==11:
+    randcoefwa = (0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875, 1.   , 1.125, 1.25 , 1.375, 1.5)
+    randcoefwi = (0.5  , 1.4  , 0.7  , 1.2  , 0.9  , 1.1  , 1.   , 0.8  , 1.3  , 0.6  , 1.5)
+elif n not in (1,11): 
+    randcoefwa = np.linspace(0.25,1.5,n)
+    randcoefwi = np.linspace(0.5,1.5,n)
+    np.random.shuffle(randcoefwi[1:-1])#shuffles the wind coef except for first and last randomly
+    
 if mainrun==True: #mainrun means no variations
     iceberg = {'length': [obslength,], 
            'water_form_drag_coef': [0.25,], 'wind_form_drag_coef': [0.8,],
@@ -150,15 +164,15 @@ if not np.isnan(obswidth): iceberg['width'][idx0] = obswidth  #correct for meass
 if not np.isnan(obsdraft): iceberg['draft'][idx0] = obsdraft  #correct for meassured width
 print(iceberg)
 
-if idx_l==[]: idx_l = [np.arange(obs.time.size),] #define specific indeces to be simulated, here full seed_idx selected
+if idx_l==[]: idx_l = [np.arange(obs['time'].size),] if type(obs['time'])!=str else [0] #define specific indeces to be simulated, here full seed_idx selected
 
 # --- Runs simulations ---
 for envinput in input_l: #Loops through the ocean and wind input
     for idx in idx_l:#loops through ranges of seeding rounds
         #---Trajectory information---
-        lons = obs.lon[idx].values
-        lats = obs.lat[idx].values
-        times = pd.to_datetime(obs.time[idx].values).to_pydatetime().tolist()
+        lons = obs['lon'][idx].data
+        lats = obs['lat'][idx].data
+        times = pd.to_datetime(obs['time'][idx].data).to_pydatetime().tolist()
         print(f"\nRunning with inputs: {envinput} for idx {idx}")
         #---Initialisation---
         o=OpenBerg(loglevel=10,logfile='./openberg_july2026/results/out_%s_%s%s%s%s%s.log'%(ib,'_'.join(envinput),'_idx%s-%s'%(idx[0],idx[-1]) if idxargs!=[] else '','_lead%s'%leadtime if leadtime!=None else '','_mainrun' if mainrun==True else '','_'+argname if argname!='' else ''))
@@ -219,6 +233,7 @@ for envinput in input_l: #Loops through the ocean and wind input
                 print(f"❌ Failed to load {dataset_id}: {e}")
     
         #---Seed icebergs---
+        # print({k:v.size for k,v in iceberg.items},lons.size,lats.size,time.size,number)
         for lon, lat, time in zip(lons, lats, times): #Loops through initialisations of time-positions
             o.seed_elements(
                 lon=lon,
