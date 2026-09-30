@@ -10,6 +10,8 @@
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":3000, "width":2000, "draft":100}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argmainrun 1 --argname 'testnew' 
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":100, "maxdraft":150, "n":20}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argradius 10000 --argname 'testnew' 
 
+# python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2024e' --argwind '["windglophynrt"]' --argoc '[["gebco","topaz4"]]' 
+
 # --- IMPORTS ---
 from src.utils import *
 from openberg_july2026.src2.utils2 import *
@@ -152,6 +154,7 @@ iceberg = calc_iceberg_size(iceberg) #this function adds missing iceberg sizes
 #---Add draft maximum---
 if 'maxdraft' in argiceberg: 
     iceberg['draft'] = np.where(iceberg['draft']<=argiceberg['maxdraft'], iceberg['draft'], argiceberg['maxdraft'])
+    iceberg['sail'] = calc_iceberg_size({k:v for k,v in iceberg.items() if k!='sail'})['sail'] #update sail according to maxdraft
     print('maxdraft of %s applied'%argiceberg['maxdraft'])
 #---Add original size---
 if mainrun==True: idx0=0
@@ -183,6 +186,7 @@ for envinput in input_l: #Loops through the ocean and wind input
         o.set_config('drift:wave_rad',argdrift['wave_rad'] if 'wave_rad' in argdrift else False)
         if openbergvers=='lia':
             o.set_config('drift:wind_drag',argdrift['wind_drag'] if 'wind_drag' in argdrift else True)
+            o.set_config('drift:sea_ice_drag',argdrift['sea_ice_drag'] if 'sea_ice_drag' in argdrift else True)
             o.set_config('drift:sea_ice_drag',argdrift['sea_ice_drag'] if 'sea_ice_drag' in argdrift else True)
         # o.set_config('general:seafloor_action','previous')
         o.set_config('general:use_auto_landmask', False)
