@@ -78,7 +78,7 @@ env_dict = {
                         if memb<10 else str(memb) for memb in range(1,11)]],                      
                        #find under: https://thredds.met.no/thredds/catalog/accibergt5/catalog.html',
     'topaz6': 'https://thredds.met.no/thredds/dodsC/cmems/topaz6/dataset-topaz6-arc-15min-3km-be.ncml', 
-    'topaz6-lowres': 'dataset-topaz6-arc-15min-3km-be',
+    'topaz6-cmems': 'dataset-topaz6-arc-15min-3km-be',
     'glophyanfcH': 'cmems_mod_glo_phy_anfc_0.083deg_PT1H-m', #Global anfc (mercator), hourly variables
     'glophyanfcD': 'cmems_mod_glo_phy_anfc_0.083deg_P1D-m', #daily variables (sea ice)
     'glorys': 'cmems_mod_glo_phy_my_0.083deg_P1D-m',

@@ -415,3 +415,136 @@ def file_dict_idx(file_l_in):
 #             v["files"] = [v["files"][i] for i in order]
 #             v["idx"] = [v["idx"][i] for i in order]
 #     return result
+
+# Functions for calculating speed, dir and components of iceberg 
+R_EARTH = 6371000.0  # m
+
+def compute_drift_kinematics(
+        ds,
+        lat_name="lat",
+        lon_name="lon",
+        time_name="time",
+    ):
+    """
+    Compute drift speed, direction, and velocity components.
+
+    Parameters
+    ----------
+    ds : xr.Dataset
+        Dataset containing:
+            lat(time)
+            lon(time)
+            time
+
+    Returns
+    -------
+    xr.Dataset
+        Original dataset with added variables:
+
+        distance_m
+        dt_s
+        speed_ms
+        u_ms
+        v_ms
+        direction_deg
+
+    Notes
+    -----
+    Direction convention: "going to"
+
+        0°   = North
+        90°  = East
+        180° = South
+        270° = West
+    """
+
+    ds = ds.sortby(time_name).copy()
+
+    lat = ds[lat_name]
+    lon = ds[lon_name]
+
+    lat1 = np.deg2rad(lat.shift({time_name: 1}))
+    lon1 = np.deg2rad(lon.shift({time_name: 1}))
+
+    lat2 = np.deg2rad(lat)
+    lon2 = np.deg2rad(lon)
+
+    # -------------------------------------------------
+    # Time difference
+    # -------------------------------------------------
+    dt = (
+        (ds[time_name] - ds[time_name].shift({time_name: 1}))
+        / np.timedelta64(1, "s")
+    )
+    # -------------------------------------------------
+    # Haversine distance
+    # -------------------------------------------------
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = (
+        np.sin(dlat / 2) ** 2
+        + np.cos(lat1)
+        * np.cos(lat2)
+        * np.sin(dlon / 2) ** 2
+    )
+
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a)) #angle distance of points
+
+    distance = R_EARTH * c
+
+    # -------------------------------------------------
+    # Local Cartesian displacement
+    # -------------------------------------------------
+    lat_mean = 0.5 * (lat1 + lat2)
+
+    dx = R_EARTH * np.cos(lat_mean) * dlon 
+    dy = R_EARTH * dlat #in meters
+
+    # -------------------------------------------------
+    # Velocity components
+    # -------------------------------------------------
+    u = dx / dt
+    v = dy / dt
+
+    # speed = np.sqrt(u**2 + v**2)
+    speed = distance / dt #more accurate and consistent, avg diff 2.4875406e-08
+
+    # -------------------------------------------------
+    # Bearing "going to"
+    # -------------------------------------------------
+    x = np.sin(dlon) * np.cos(lat2)
+
+    y = (
+        np.cos(lat1) * np.sin(lat2)
+        - np.sin(lat1)
+        * np.cos(lat2)
+        * np.cos(dlon)
+    )
+
+    bearing = (
+        np.degrees(np.arctan2(x, y)) + 360
+    ) % 360
+
+    # -------------------------------------------------
+    # Store results
+    # -------------------------------------------------
+    ds["distance_m"] = distance
+    ds["dt_s"] = dt
+
+    ds["u_ms"] = u
+    ds["v_ms"] = v
+
+    ds["speed_ms"] = speed
+    ds["direction_deg"] = bearing
+
+    ds["distance_m"].attrs["units"] = "m"
+    ds["dt_s"].attrs["units"] = "s"
+
+    ds["u_ms"].attrs["units"] = "m s-1"
+    ds["v_ms"].attrs["units"] = "m s-1"
+
+    ds["speed_ms"].attrs["units"] = "m s-1"
+    ds["direction_deg"].attrs["units"] = "degree"
+
+    return ds

@@ -10,7 +10,7 @@
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":3000, "width":2000, "draft":100}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argmainrun 1 --argname 'testnew' 
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":100, "maxdraft":150, "n":20}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argradius 10000 --argname 'testnew' 
 
-# python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2024e' --argwind '["windglophynrt"]' --argoc '[["gebco","topaz4"]]' 
+# python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2017b' --argwind '["windglophyre"]' --argoc '[["gebco","topaz4"]]' 
 
 # --- IMPORTS ---
 from src.utils import *
@@ -172,6 +172,7 @@ if idx_l==[]: idx_l = [np.arange(obs['time'].size),] if type(obs['time'])!=str e
 # --- Runs simulations ---
 for envinput in input_l: #Loops through the ocean and wind input
     for idx in idx_l:#loops through ranges of seeding rounds
+        print('%s/%s'%(idx,len(idx_l)))
         #---Trajectory information---
         lons = obs['lon'][idx].data
         lats = obs['lat'][idx].data
