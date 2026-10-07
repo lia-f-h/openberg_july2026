@@ -11,6 +11,7 @@
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":100, "maxdraft":150, "n":20}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argradius 10000 --argname 'testnew' 
 
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2017b' --argwind '["windglophyre"]' --argoc '[["gebco","topaz4"]]' 
+# python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2017b' --argwind '["windglophyre"]' --argoc '[["gebco","topaz4"]]' --argiceberg '{"csi2":true}' --argopenberg 'lia2' --argidx '[[0,0]]'
 
 # --- IMPORTS ---
 from src.utils import *
@@ -53,6 +54,7 @@ argname = args.argname
 openbergvers = args.argopenberg
 if openbergvers=='orig': from openberg_july2026.src2.openberg_orig import OpenBerg
 elif openbergvers=='lia': from openberg_july2026.src2.openberg_lia import OpenBerg
+elif openbergvers=='lia2': from openberg_july2026.src2.openberg_lia2 import OpenBerg
 print('Openberg.py used from ',args.argopenberg)
 
 
@@ -134,6 +136,7 @@ randlength = obslength * logspace
 if n==11:
     randcoefwa = (0.25 , 0.375, 0.5  , 0.625, 0.75 , 0.875, 1.   , 1.125, 1.25 , 1.375, 1.5)
     randcoefwi = (0.5  , 1.4  , 0.7  , 1.2  , 0.9  , 1.1  , 1.   , 0.8  , 1.3  , 0.6  , 1.5)
+    randcoefsi2 =(0.5  , 1.1  , 0.6  , 1.3  , 0.7  , 1.2  , 1.   , 0.9   , 1.4  , 0.8   , 1.5)
 elif n not in (1,11): 
     randcoefwa = np.linspace(0.25,1.5,n)
     randcoefwi = np.linspace(0.5,1.5,n)
@@ -145,10 +148,12 @@ if mainrun==True: #mainrun means no variations
            'radius':1}
 else: #variations 
     iceberg = {'length': randlength, 
-           'water_form_drag_coef': randcoefwa, 'wind_form_drag_coef': randcoefwi,
+           'water_form_drag_coef': randcoefwa, 'wind_form_drag_coef': randcoefwi, 
            'radius':argradius}
+    if ('csi2' in argiceberg) and (argiceberg['csi2'] == True): iceberg['csi2']=randcoefsi2
 if 'water_form_drag_coef' in argiceberg: iceberg['water_form_drag_coef'] = argiceberg['water_form_drag_coef']
 if 'wind_form_drag_coef' in argiceberg: iceberg['wind_form_drag_coef'] = argiceberg['wind_form_drag_coef']
+if ('csi2' in argiceberg) and (argiceberg['csi2'] not in (True, False)): iceberg['csi2'] = argiceberg['csi2']
 #---Size correction---
 iceberg = calc_iceberg_size(iceberg) #this function adds missing iceberg sizes
 #---Add draft maximum---
