@@ -1,0 +1,166 @@
+15:14:58 DEBUG   opendrift.config:168: Adding 17 config items from __init__
+15:14:58 DEBUG   opendrift.config:178:   Overwriting config item readers:max_number_of_fails
+15:14:58 DEBUG   opendrift.config:168: Adding 14 config items from __init__
+15:14:58 INFO    opendrift:568: OpenDriftSimulation initialised (version 1.14.9)
+15:14:58 DEBUG   opendrift.config:168: Adding 15 config items from openberg_lia
+15:14:58 DEBUG   opendrift.readers.reader_netCDF_CF_generic:131: Finding coordinate variables.
+15:14:58 DEBUG   opendrift.readers.reader_netCDF_CF_generic:146: Parsing CF grid mapping dictionary: {'grid_mapping_name': 'latitude_longitude', 'long_name': 'CRS definition', 'longitude_of_prime_meridian': np.float64(0.0), 'semi_major_axis': np.float64(6378137.0), 'inverse_flattening': np.float64(298.257223563), 'crs_wkt': 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]', 'spatial_ref': 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]', 'GeoTransform': '-80 0.004166666666666667 0 85 0 -0.004166666666666667 '}
+15:14:58 DEBUG   opendrift.readers.reader_netCDF_CF_generic:270: Lon and lat are 1D arrays - using as projection coordinates
+15:14:58 INFO    opendrift.readers.reader_netCDF_CF_generic:340: Detected dimensions: {'x': 'lon', 'y': 'lat'}
+15:14:58 WARNING opendrift.readers.basereader.variables:607: Assuming time step of 1 hour for gebco
+15:14:58 DEBUG   opendrift.readers.basereader.variables:614: Setting buffer size 41 for reader gebco, assuming a maximum average speed of 5 m/s and time span of 1:00:00
+15:14:58 DEBUG   opendrift.readers.basereader:188: Variable mapping: ['sea_floor_depth_below_sea_level'] -> ['land_binary_mask'] is not activated
+15:14:58 DEBUG   opendrift.models.basemodel.environment:313: Added reader gebco
+15:15:03 DEBUG   opendrift.readers.reader_netCDF_CF_generic:131: Finding coordinate variables.
+15:15:03 DEBUG   opendrift.readers.reader_netCDF_CF_generic:146: Parsing CF grid mapping dictionary: {'grid_mapping_name': 'polar_stereographic', 'latitude_of_projection_origin': np.float64(90.0), 'longitude_of_projection_origin': np.float64(-45.0), 'scale_factor_at_projection_origin': np.float64(1.0), 'straight_vertical_longitude_from_pole': np.float64(-45.0), 'earth_radius': np.float64(6378273.0), 'proj4': '+proj=stere +lon_0=-45 +lat_0=90 +k=1 +R=6378273 +no_defs', 'false_easting': np.float64(0.0), 'false_northing': np.float64(0.0)}
+15:15:03 DEBUG   opendrift.readers.reader_netCDF_CF_generic:245: 10 ensemble members available
+15:15:03 INFO    opendrift.readers.reader_netCDF_CF_generic:340: Detected dimensions: {'x': 'x', 'y': 'y', 'z': 'depth', 'time': 'time'}
+15:15:03 DEBUG   opendrift.readers.reader_netCDF_CF_generic:376: Skipped variables without standard_name: ['surtx', 'surty']
+15:15:03 DEBUG   opendrift.readers.basereader.variables:614: Setting buffer size 72 for reader ensemble, assuming a maximum average speed of 5 m/s and time span of 1 day, 0:00:00
+15:15:03 DEBUG   opendrift.readers.basereader:188: Variable mapping: ['sea_floor_depth_below_sea_level'] -> ['land_binary_mask'] is not activated
+15:15:03 DEBUG   opendrift.readers.basereader.variables:569: Adding variable mapping: ['sea_ice_x_velocity', 'sea_ice_y_velocity'] -> sea_ice_speed
+15:15:03 DEBUG   opendrift.readers.basereader.variables:569: Adding variable mapping: ['x_sea_water_velocity', 'y_sea_water_velocity'] -> sea_water_speed
+15:15:03 DEBUG   opendrift.models.basemodel.environment:313: Added reader ensemble
+15:15:03 DEBUG   opendrift.readers.reader_lazy:37: Delaying initialisation of LazyReader: cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H
+15:15:03 DEBUG   opendrift.models.basemodel.environment:313: Added reader LazyReader: cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H
+15:15:03 INFO    opendrift.models.basemodel.environment:227: Fallback values will be used for the following variables which have no readers: 
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	sea_surface_x_slope: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	sea_surface_y_slope: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	x_wind: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	y_wind: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	horizontal_diffusivity: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	sea_surface_wave_significant_height: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	sea_surface_wave_from_direction: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	sea_surface_wave_stokes_drift_x_velocity: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	sea_surface_wave_stokes_drift_y_velocity: 0.000000
+15:15:03 INFO    opendrift.models.basemodel.environment:230: 	sea_water_salinity: 35.000000
+15:15:03 DEBUG   opendrift:164: Changed mode from Mode.Config to Mode.Ready
+15:15:03 DEBUG   opendrift:164: Changed mode from Mode.Ready to Mode.Run
+15:15:03 DEBUG   opendrift:1800: 
+------------------------------------------------------
+Software and hardware:
+  OpenDrift version 1.14.9
+  Platform: Linux, 5.17.4-200.fc35.x86_64
+  31.349510192871094 GB memory
+  8 processors (x86_64)
+  NumPy version 2.5.3
+  SciPy version 1.18.1
+  Matplotlib version 3.11.2
+  NetCDF4 version 1.7.4
+  Xarray version 2026.7.0
+  ADIOS (adios_db) version 1.2.7
+  Copernicusmarine version 2.4.1
+  Python version 3.12.12 | packaged by conda-forge | (main, Oct 22 2025, 23:25:55) [GCC 14.3.0]
+------------------------------------------------------
+
+15:15:03 INFO    opendrift:1839: Storing previous values of element property lon because of condition (('general:coastline_action', 'in', ['stranding', 'previous']), 'or', ('general:seafloor_action', 'in', ['previous']))
+15:15:03 INFO    opendrift:1839: Storing previous values of element property lat because of condition (('general:coastline_action', 'in', ['stranding', 'previous']), 'or', ('general:seafloor_action', 'in', ['previous']))
+15:15:03 DEBUG   opendrift:1962: Finalizing environment and preparing readers for simulation coverage ([-85.60128419  73.65792509 -57.83800108  79.9982181 ]) and time (2025-10-24 18:02:04 to 2025-10-28 18:02:04)
+15:15:03 DEBUG   opendrift.models.basemodel.environment:166: 	Preparing gebco for extent [-85.60128419  73.65792509 -57.83800108  79.9982181 ]
+15:15:03 DEBUG   opendrift.readers.basereader.structured:151: Clearing cache for reader gebco before starting new simulation
+15:15:03 DEBUG   opendrift.readers.basereader.structured:156: Time step is None for gebco, setting buffer size large nough for whole simulation
+15:15:03 DEBUG   opendrift.readers.basereader.variables:614: Setting buffer size 750 for reader gebco, assuming a maximum average speed of 1 m/s and time span of 4 days, 0:00:00
+15:15:03 DEBUG   opendrift.readers.basereader.variables:555: Nothing more to prepare for gebco
+15:15:03 DEBUG   opendrift.models.basemodel.environment:166: 	Preparing ensemble for extent [-85.60128419  73.65792509 -57.83800108  79.9982181 ]
+15:15:03 DEBUG   opendrift.readers.basereader.structured:151: Clearing cache for reader ensemble before starting new simulation
+15:15:03 DEBUG   opendrift.readers.basereader.variables:614: Setting buffer size 16 for reader ensemble, assuming a maximum average speed of 1 m/s and time span of 1 day, 0:00:00
+15:15:03 DEBUG   opendrift.readers.basereader.variables:555: Nothing more to prepare for ensemble
+15:15:03 DEBUG   opendrift.models.basemodel.environment:166: 	Preparing LazyReader: cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H for extent [-85.60128419  73.65792509 -57.83800108  79.9982181 ]
+15:15:03 DEBUG   opendrift:2059: Initial self.result, size Frozen({'trajectory': 11, 'time': 97})
+15:15:03 DEBUG   opendrift.export.io_netcdf:24: Initialising output netCDF file {self.outfile_name}
+15:15:03 INFO    opendrift:947: Using existing reader for land_binary_mask to move elements to ocean
+15:15:03 DEBUG   opendrift.models.basemodel.environment:599: ----------------------------------------
+15:15:03 DEBUG   opendrift.models.basemodel.environment:600: Variable group ['land_binary_mask']
+15:15:03 DEBUG   opendrift.models.basemodel.environment:601: ----------------------------------------
+15:15:03 DEBUG   opendrift.models.basemodel.environment:605: Calling reader gebco
+15:15:03 DEBUG   opendrift.models.basemodel.environment:606: ----------------------------------------
+15:15:03 DEBUG   opendrift.models.basemodel.environment:626: Data needed for 11 elements
+15:15:03 DEBUG   opendrift.readers.basereader.variables:761: Fetching variables from gebco covering 11 elements
+15:15:03 DEBUG   opendrift.readers.basereader.structured:220: Reader time:
+		None (before)
+		None (after)
+15:15:17 DEBUG   opendrift.readers.basereader.variables:639: Checking land_binary_mask for invalid values
+15:15:17 DEBUG   opendrift.readers.interpolation.structured:92: Nearest interpolation will be used for landmask, and linearNDFast for other variables
+15:15:17 DEBUG   opendrift.readers.basereader.structured:290: Fetched env-block (size 1596x1527x1) for time before (None)
+15:15:17 DEBUG   opendrift.readers.basereader.structured:334: Interpolating before (None) in space  (linearNDFast)
+15:15:17 DEBUG   opendrift.readers.interpolation.structured:97: Initialising interpolator.
+15:15:17 DEBUG   opendrift.readers.basereader.structured:388: No time interpolation needed - right on time.
+15:15:17 DEBUG   opendrift.readers.basereader.variables:797: Reader projection is latlon - rotation of vectors is not needed.
+15:15:17 DEBUG   opendrift.models.basemodel.environment:762: Obtained data for all elements.
+15:15:17 DEBUG   opendrift.models.basemodel.environment:775: ---------------------------------------
+15:15:17 DEBUG   opendrift.models.basemodel.environment:776: Finished processing all variable groups
+15:15:17 DEBUG   opendrift.models.basemodel.environment:898: ------------ SUMMARY -------------
+15:15:17 DEBUG   opendrift.models.basemodel.environment:900:     land_binary_mask: 0 (min) 0 (max)
+15:15:17 DEBUG   opendrift.models.basemodel.environment:902: ---------------------------------
+15:15:17 INFO    opendrift:978: All points are in ocean
+15:15:17 DEBUG   opendrift:904: to be seeded: 11, already seeded 0
+15:15:17 DEBUG   opendrift:926: Released 11 new elements.
+15:15:17 DEBUG   opendrift:2135: ======================================================================
+15:15:17 INFO    opendrift:2136: 2025-10-24 18:02:04 - step 1 of 96 - 11 active elements (0 deactivated)
+15:15:17 DEBUG   opendrift:2142: 0 elements scheduled.
+15:15:17 DEBUG   opendrift:2144: ======================================================================
+15:15:17 DEBUG   opendrift:2155: 		76.77143859863281 <- latitude -> 76.88470458984375
+15:15:17 DEBUG   opendrift:2155: 		-71.91777038574219 <- longitude -> -71.52151489257812
+15:15:17 DEBUG   opendrift:2153: 		z = 0.0
+15:15:17 DEBUG   opendrift:2156: ---------------------------------
+15:15:17 DEBUG   opendrift.models.basemodel.environment:574: Variables not covered by any reader: ['x_wind', 'y_wind', 'sea_surface_wave_from_direction', 'sea_water_salinity', 'sea_surface_wave_significant_height']
+15:15:17 DEBUG   opendrift.readers.reader_lazy:56: Initialising: LazyReader: cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H
+15:15:17 DEBUG   opendrift.readers:189: Testing reader <module 'opendrift.readers.reader_copernicusmarine' from '/opt/conda/lib/python3.12/site-packages/opendrift/readers/reader_copernicusmarine.py'>
+15:15:17 INFO    opendrift.readers.reader_copernicusmarine:39: Using CMEMS password for user lherrmannsdoerf from environment variables COPERNICUSMARINE_SERVICE_USERNAME and COPERNICUSMARINE_SERVICE_PASSWORD
+15:15:18 DEBUG   opendrift.readers.reader_netCDF_CF_generic:131: Finding coordinate variables.
+15:15:18 INFO    opendrift.readers.reader_netCDF_CF_generic:307: Grid coordinates are detected, but proj4 string not given: assuming latlong
+15:15:18 INFO    opendrift.readers.reader_netCDF_CF_generic:340: Detected dimensions: {'y': 'latitude', 'x': 'longitude', 'time': 'time'}
+15:15:18 DEBUG   opendrift.readers.basereader.variables:614: Setting buffer size 4 for reader cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H, assuming a maximum average speed of 5 m/s and time span of 1:00:00
+15:15:18 INFO    opendrift.readers.basereader:178: Variable x_wind will be rotated from eastward_wind
+15:15:18 INFO    opendrift.readers.basereader:178: Variable y_wind will be rotated from northward_wind
+15:15:18 DEBUG   opendrift.readers.basereader:188: Variable mapping: ['sea_floor_depth_below_sea_level'] -> ['land_binary_mask'] is not activated
+15:15:18 DEBUG   opendrift.readers.basereader.variables:569: Adding variable mapping: ['x_wind', 'y_wind'] -> wind_speed
+15:15:18 DEBUG   opendrift.readers.basereader.structured:151: Clearing cache for reader cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H before starting new simulation
+15:15:18 DEBUG   opendrift.readers.basereader.variables:614: Setting buffer size 3 for reader cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H, assuming a maximum average speed of 1 m/s and time span of 1:00:00
+15:15:18 DEBUG   opendrift.readers.basereader.variables:555: Nothing more to prepare for cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H
+15:15:18 DEBUG   opendrift.readers.reader_lazy:71: Reader initialised: cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H
+15:15:18 DEBUG   opendrift.readers.basereader.variables:614: Setting buffer size 3 for reader cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H, assuming a maximum average speed of 1 m/s and time span of 1:00:00
+15:15:18 DEBUG   opendrift.models.basemodel.environment:599: ----------------------------------------
+15:15:18 DEBUG   opendrift.models.basemodel.environment:600: Variable group ['sea_floor_depth_below_sea_level']
+15:15:18 DEBUG   opendrift.models.basemodel.environment:601: ----------------------------------------
+15:15:18 DEBUG   opendrift.models.basemodel.environment:605: Calling reader gebco
+15:15:18 DEBUG   opendrift.models.basemodel.environment:606: ----------------------------------------
+15:15:18 DEBUG   opendrift.models.basemodel.environment:626: Data needed for 11 elements
+15:15:18 DEBUG   opendrift.readers.basereader.variables:761: Fetching variables from gebco covering 11 elements
+15:15:18 DEBUG   opendrift.readers.basereader.structured:220: Reader time:
+		None (before)
+		None (after)
+15:15:32 DEBUG   opendrift.readers.basereader.variables:639: Checking sea_floor_depth_below_sea_level for invalid values
+15:15:32 DEBUG   opendrift.readers.basereader.structured:290: Fetched env-block (size 1596x1527x1) for time before (None)
+15:15:32 DEBUG   opendrift.readers.basereader.structured:334: Interpolating before (None) in space  (linearNDFast)
+15:15:32 DEBUG   opendrift.readers.interpolation.structured:97: Initialising interpolator.
+15:15:32 DEBUG   opendrift.readers.basereader.structured:388: No time interpolation needed - right on time.
+15:15:32 DEBUG   opendrift.readers.basereader.variables:797: Reader projection is latlon - rotation of vectors is not needed.
+15:15:32 DEBUG   opendrift.models.basemodel.environment:762: Obtained data for all elements.
+15:15:32 DEBUG   opendrift.models.basemodel.environment:599: ----------------------------------------
+15:15:32 DEBUG   opendrift.models.basemodel.environment:600: Variable group ['land_binary_mask']
+15:15:32 DEBUG   opendrift.models.basemodel.environment:601: ----------------------------------------
+15:15:32 DEBUG   opendrift.models.basemodel.environment:605: Calling reader gebco
+15:15:32 DEBUG   opendrift.models.basemodel.environment:606: ----------------------------------------
+15:15:32 DEBUG   opendrift.models.basemodel.environment:626: Data needed for 11 elements
+15:15:32 DEBUG   opendrift.readers.basereader.variables:761: Fetching variables from gebco covering 11 elements
+15:15:32 DEBUG   opendrift.readers.basereader.structured:220: Reader time:
+		None (before)
+		None (after)
+15:15:32 DEBUG   opendrift.readers.basereader.structured:334: Interpolating before (None) in space  (linearNDFast)
+15:15:32 DEBUG   opendrift.readers.interpolation.structured:97: Initialising interpolator.
+15:15:32 DEBUG   opendrift.readers.basereader.structured:388: No time interpolation needed - right on time.
+15:15:32 DEBUG   opendrift.readers.basereader.variables:797: Reader projection is latlon - rotation of vectors is not needed.
+15:15:32 DEBUG   opendrift.models.basemodel.environment:762: Obtained data for all elements.
+15:15:32 DEBUG   opendrift.models.basemodel.environment:599: ----------------------------------------
+15:15:32 DEBUG   opendrift.models.basemodel.environment:600: Variable group ['sea_water_temperature', 'x_sea_water_velocity', 'y_sea_water_velocity', 'sea_surface_height', 'sea_ice_thickness', 'sea_ice_area_fraction', 'sea_ice_x_velocity', 'sea_ice_y_velocity']
+15:15:32 DEBUG   opendrift.models.basemodel.environment:601: ----------------------------------------
+15:15:32 DEBUG   opendrift.models.basemodel.environment:605: Calling reader ensemble
+15:15:32 DEBUG   opendrift.models.basemodel.environment:606: ----------------------------------------
+15:15:32 DEBUG   opendrift.models.basemodel.environment:626: Data needed for 11 elements
+15:15:32 DEBUG   opendrift.readers.basereader.variables:761: Fetching variables from ensemble covering 11 elements
+15:15:32 DEBUG   opendrift.readers.basereader.structured:220: Reader time:
+		2025-10-24 12:00:00 (before)
+		2025-10-25 12:00:00 (after)
+15:16:25 DEBUG   opendrift.readers.reader_netCDF_CF_generic:561: Num ensembles for sea_water_temperature: 10
+15:17:11 DEBUG   opendrift.readers.reader_netCDF_CF_generic:561: Num ensembles for x_sea_water_velocity: 10

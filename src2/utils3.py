@@ -2,7 +2,7 @@ from src.utils import *
 
 
 def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
-                save=False, title=False,
+                save=False, title=False, legend=True,titlefs=12,
                ):
     import pyproj
     from scipy.stats import circmean
@@ -253,34 +253,36 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
     plt.gca().set_aspect(
         "equal", adjustable="box"
     )  # Set aspect ratio to make it look polar
-    if title!=False: ax.set_title(title)
+    if title!=False: ax.set_title(title,fontsize=titlefs,weight='bold')
+
     #legend
-    # fig.legend(fontsize=12)
-    #6h data points
-    legend_elements = [Line2D([0], [0],linestyle='-', color='w', marker='v', markerfacecolor='w',markeredgecolor='k', lw=1,
-                              label=f"6-hourly data points of simulations using input from "),]
-    #runs
-    # legend_elements = legend_elements+[Line2D([0], [0],linestyle='-', color='w', marker='v', markerfacecolor=col[runn],markeredgecolor='k', lw=1,
-    #                           label=f"{run.item()[19:-3].replace('_',', ').title()} mean error (R={np.round(means_save[run.item()][0],1)},theta={np.round(means_save[run.item()][1],1) if means_save[run.item()][1]<180 else np.round(means_save[run.item()][1]-360,1)}°)") for runn,run in enumerate(sim_in.run)]
-                            #Line2D([0], [0],linestyle='-', color=legenddict[el]['col'],alpha=legenddict[el]['alpha'], lw=1, label=el) for el in legenddict]
-    legend_elements = legend_elements+[Line2D([0], [0],linestyle='-', color='w', markerfacecolor=legenddict[run]['col'],
-                                              alpha=legenddict[run]['alpha'], marker='v',markeredgecolor='k', lw=1,
-                                       label=f"{legenddict[run]['kw']} ($R$={np.round(means_save[run][0],2)},$theta$={np.round(means_save[run][1],1) 
-                                       if means_save[run][1]<180 else np.round(means_save[run][1]-360,1)}°)") 
-                                    for run in list(sim_in.run.values)]
-    #mean error all
-    legend_elements = legend_elements+[                      
-                      Line2D([0], [0],linestyle='--', color='k',marker='o',markerfacecolor='w' if sim_in.run.size>1 else col_run,
-                             markeredgecolor='k', lw=1,
-                             label=f"Mean error distance ($R$={np.round(r_avg_insiders_all,2)}) & \ndirection ($theta$={np.round(theta_avg_insiders_all,1) if theta_avg_insiders_all<180 else np.round(theta_avg_insiders_all-360,1)}°) (all input)")]
-    #contours
-    legend_elements = legend_elements+[Line2D([0], [0],linestyle='--', color='r',marker='x', lw=1,label='Target (Observation)'),
-                      Patch(facecolor=plt.colormaps['viridis'](0.2), edgecolor='k',label='Confidence contours (all input)'),
-                      ]
-    leg = fig.legend(handles=legend_elements,fontsize=12,#,ncol=len(legend_elements0+legend_elements2), columnspacing=0.6,labelspacing=0.3,loc='center',bbox_to_anchor=bbox_dict[kw][0])
-                       loc='upper center', bbox_to_anchor=(0.5,0.05))
-                       # loc='center left', bbox_to_anchor=(0.9,0.5))
-    
+    if legend!=False:
+        # fig.legend(fontsize=12)
+        #6h data points
+        legend_elements = [Line2D([0], [0],linestyle='-', color='w', marker='v', markerfacecolor='w',markeredgecolor='k', lw=1,
+                                  label=f"Daily data points of simulations using"),]
+        #runs
+        # legend_elements = legend_elements+[Line2D([0], [0],linestyle='-', color='w', marker='v', markerfacecolor=col[runn],markeredgecolor='k', lw=1,
+        #                           label=f"{run.item()[19:-3].replace('_',', ').title()} mean error (R={np.round(means_save[run.item()][0],1)},theta={np.round(means_save[run.item()][1],1) if means_save[run.item()][1]<180 else np.round(means_save[run.item()][1]-360,1)}°)") for runn,run in enumerate(sim_in.run)]
+                                #Line2D([0], [0],linestyle='-', color=legenddict[el]['col'],alpha=legenddict[el]['alpha'], lw=1, label=el) for el in legenddict]
+        legend_elements = legend_elements+[Line2D([0], [0],linestyle='-', color='w', markerfacecolor=legenddict[run]['col'],
+                                                  alpha=legenddict[run]['alpha'], marker='v',markeredgecolor='k', lw=1,
+                                           label=f"{legenddict[run]['kw']} ($R$={np.round(means_save[run][0],2)},$theta$={np.round(means_save[run][1],1) 
+                                           if means_save[run][1]<180 else np.round(means_save[run][1]-360,1)}°)") 
+                                        for run in list(sim_in.run.values)]
+        #mean error all
+        legend_elements = legend_elements+[                      
+                          Line2D([0], [0],linestyle='--', color='k',marker='o',markerfacecolor='w' if sim_in.run.size>1 else col_run,
+                                 markeredgecolor='k', lw=1,
+                                 label=f"Mean error distance ($R$={np.round(r_avg_insiders_all,2)}) & \ndirection ($theta$={np.round(theta_avg_insiders_all,1) if theta_avg_insiders_all<180 else np.round(theta_avg_insiders_all-360,1)}°) (all input)")]
+        #contours
+        legend_elements = legend_elements+[Line2D([0], [0],linestyle='--', color='r',marker='x', lw=1,label='Target (Observation)'),
+                          Patch(facecolor=plt.colormaps['viridis'](0.2), edgecolor='k',label='Confidence contours (all input)'),
+                          ]
+        leg = fig.legend(handles=legend_elements,fontsize=12,#,ncol=len(legend_elements0+legend_elements2), columnspacing=0.6,labelspacing=0.3,loc='center',bbox_to_anchor=bbox_dict[kw][0])
+                           loc='upper center', bbox_to_anchor=(0.5,0.09))
+                           # loc='center left', bbox_to_anchor=(0.9,0.5))
+        
     if save!=False: plt.savefig('./results/analysis_polarplot_%s.png'%(save), bbox_inches="tight", dpi=400)
     plt.show()
     return {'mean':means_save,'spread':spread_save}

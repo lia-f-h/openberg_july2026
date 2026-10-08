@@ -11,6 +11,7 @@
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2026e' --argobs 'None' --argiceberg '{"time":"2026-09-11T8:21", "lat":66.87652, "lon":-29.18724, "length":100, "maxdraft":150, "n":20}' --argoc '[["gebco","topaz5"]]' --argleadtime 20 --argradius 10000 --argname 'testnew' 
 
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2017b' --argwind '["windglophyre"]' --argoc '[["gebco","topaz4"]]' 
+
 # python3 -m openberg_july2026.scripts.sim_argparse --argib 'iceberg2017b' --argwind '["windglophyre"]' --argoc '[["gebco","topaz4"]]' --argiceberg '{"csi2":true}' --argopenberg 'lia2' --argidx '[[0,0]]'
 
 # --- IMPORTS ---
@@ -233,10 +234,9 @@ for envinput in input_l: #Loops through the ocean and wind input
                     o.add_reader(reader_env)
                 elif isinstance(dataset_id, list) and 'ensemble' in envin: #list of urls or files, eg. for topaz4 ensemble
                     ds_env = xr.open_mfdataset(dataset_id,
-                                concat_dim=xr.DataArray(members, dims='member', name='member',
-                                attrs={'standard_name': 'realization'}),
+                                concat_dim=xr.DataArray(range(1,11), dims='member', name='member',attrs={'standard_name': 'realization'}),
                                 combine='nested', data_vars='all', coords='all', chunks={'time': 1}) #Solution from KF!
-                    reader_env = Reader(ds_env)
+                    reader_env = Reader(ds_env,name='ensemble')
                     o.add_reader(reader_env)
                 else: o.add_readers_from_list([dataset_id]) 
             except Exception as e:
