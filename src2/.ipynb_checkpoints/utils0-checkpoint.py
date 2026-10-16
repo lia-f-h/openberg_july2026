@@ -39,6 +39,11 @@ dict_analysis_period = {
         'noseaice':slice('2019-05-29','2019-06-18'),
         'wave':slice('2019-04-30','2019-06-18')
         },
+    'iceberg2025w':{'full':slice('2025-10-11T00', '2025-12-09T23'),
+                    1:slice('2025-10-11T00','2025-10-23T00'), 
+                    2:slice('2025-10-24T00','2025-11-23T17'), 
+                    12:slice('2025-10-11T00','2025-11-23T17'), 
+                    3:slice('2025-11-23T18','2025-12-09T23') },
     'iceberg2026e':    {
         'full': slice('2026-05-28','2026-08-20'),
         1:slice('2026-07-03','2026-08-20'),
@@ -58,10 +63,6 @@ dict_analysis_period = {
         2:slice('2011-12-22','2012-02-11'),},
     'iceberg2011w2':    {
         'full': slice('2011-09-26','2011-11-23'),},
-    'iceberg2025w':{'full':slice('2025-10-11T00', '2025-12-09T23'),
-                    1:slice('2025-10-11T00','2025-10-23T00'), 
-                    2:slice('2025-10-24T00','2025-11-22T00'), 
-                    3:slice('2025-11-23T18','2025-12-09T23') }
     }
 dict_traj = {#only added when restrictions are in place
     # 'iceberg2017b':{'iceberg2017b_gebco_topaz4_windglophyre':np.arange(187)}#187
