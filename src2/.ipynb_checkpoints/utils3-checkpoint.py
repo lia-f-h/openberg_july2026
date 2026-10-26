@@ -14,11 +14,15 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
     # cmap = plt.get_cmap('tab20')  # or 'viridis', 'plasma', etc.
     # col = cmap(np.linspace(0, 1, 20))[::2]#20 colors
     # url_letters, name_letters,note_letters, fileending_letters = 10,14,0,3
-    means_save = {}
-    spread_save = {}
+    
+    r_mean,theta_mean,r_min,r_max,theta_min,theta_max,n_save = {},{},{},{},{},{},{}
+    r_mean2, theta_mean2 = {}, {}
+    r_spread_ts,theta_spread_ts = {},{}
+    
     
     
     # observation = ref
+
     azimuth_alpha, a2, distance0 = geod.inv(
         obs_in.lon[:-1],obs_in.lat[:-1],obs_in.lon[1:],obs_in.lat[1:])
     dt = np.diff(obs_in.time) / np.timedelta64(1, "s")  #individual timesteps between the points
@@ -36,8 +40,17 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
     THETA = (azimuth_betha - azimuth_alpha + 180) % 360 - 180 #all
     # R = np.where(vel0>0,vel1 / vel0,np.nan) # if vel0 > 0 else 0
     # R = np.where((R <= 3)&(R > 0.0),R,np.nan) #correction for outliers and non-drifting icebergs
+    # R = np.where(distance0>0,distance1 / distance0,np.nan)
+    # R = np.where((R <= RLIM)&(R > 0.0),R,np.nan)
+    #subset for valid R only
     R = np.where(distance0>0,distance1 / distance0,np.nan)
-    R = np.where((R <= RLIM)&(R > 0.0),R,np.nan)
+    R = np.where((R!=0.0) & (R<RLIM),R,np.nan)
+    THETA = np.where(np.isnan(R)==False,THETA,np.nan)
+    #apply percentiles
+    R10,R90 = np.nanpercentile(R, [10, 90])
+    R_perc, THETA_perc =  np.where(R<R90,R,np.nan), np.where(R<R90,THETA,np.nan)
+    print('Checks:', R.shape, np.any(R==0), np.nanmax(R), np.nanmax(THETA), R_perc.shape, np.nanmin(R_perc), np.nanmin(THETA_perc), np.nanmax(R_perc), np.nanmax(THETA_perc))
+
     
     # #average meassures (incl outsiders)
     # r_avg_with_outsiders = np.nanmean(R)
@@ -72,7 +85,9 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
     #                        np.mean(np.cos(angles)))
     
     # --- compute centroid in cartesian space ---
-    x, y = polar_to_cartesian(np.pi / 2 - np.radians(THETA[R <= RLIM]), R[R <= RLIM]) #used in scatterplot
+    # x, y = polar_to_cartesian(np.pi / 2 - np.radians(THETA[R <= RLIM]), R[R <= RLIM]) #used in scatterplot
+    x1,y1 = polar_to_cartesian(np.pi / 2 - np.radians(THETA),R) #used in scatterplot, subset done above
+    x, y = polar_to_cartesian(np.pi / 2 - np.radians(THETA_perc),R_perc) #used in scatterplot, subset done above
     x_insiders_all = np.nanmean(x)
     y_insiders_all = np.nanmean(y)
     # --- convert centroid BACK to polar (for text output) ---
@@ -83,17 +98,29 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
     theta_avg_insiders_all = np.degrees(np.pi/2 - theta_plot)
     # normalize to [-180, 180]
     theta_avg_insiders_all = (theta_avg_insiders_all + 180) % 360 - 180
-    means_save['all'] = [np.round(vals,2) for vals in (r_avg_insiders_all,theta_avg_insiders_all)]
-    spread_save['all'] = [np.round(vals,2) 
-                          for vals in (np.nanmax(R) - np.nanmin(R),
-                                       np.nanpercentile(R, 90) - np.nanpercentile(R, 10),
-                                       np.nanmax(THETA) - np.nanmin(THETA),
-                                       np.nanpercentile(THETA, 90) - np.nanpercentile(THETA, 10))] #range as in max-min and IQR range (from 90 to 10%)
-    
+
+    #save
+    r_mean2['all'],theta_mean2['all'] = np.round(np.nanmean(R_perc),2), np.round(np.nanmean(THETA_perc),2)
+    r_mean['all'],theta_mean['all'] = r_avg_insiders_all, theta_avg_insiders_all
+    r_min['all'],r_max['all'],theta_min['all'],theta_max['all'] = R10, R90, np.nanpercentile(THETA, 10), np.nanpercentile(THETA, 90)
+    n_save['all']= R.size
+    # minmax_save['all'] = [np.round(vals,2)
+    #                                for vals in (np.nanpercentile(R, 10),np.nanpercentile(R, 90),
+    #                                             np.nanpercentile(THETA, 10),np.nanpercentile(THETA, 90))] #minmax of perc
+    # spread_save['all'] = [np.round(vals,2) 
+    #                       for vals in (np.nanmax(R) - np.nanmin(R),
+    #                                    np.nanpercentile(R, 90) - np.nanpercentile(R, 10),
+    #                                    np.nanmax(THETA) - np.nanmin(THETA),
+    #                                    np.nanpercentile(THETA, 90) - np.nanpercentile(THETA, 10))] #range as in max-min and IQR range (from 90 to 10%)
+    r_spread_ts['all'] = np.nanpercentile(R, 90,axis=(0,1)) - np.nanpercentile(R, 10,axis=(0,1))
+    theta_spread_ts['all'] = np.nanpercentile(THETA, 90,axis=1) - np.nanpercentile(THETA, 10,axis=1)
+    print('Result shape:',R.shape, r_spread_ts['all'].shape)
+
     #density grid
+    x1,y1 = x1[(np.isnan(x1)==False) & (np.isnan(y1)==False)],y1[(np.isnan(x1)==False) & (np.isnan(y1)==False)]
     grid_size = 100
     percentages = [0.9, 0.75, 0.5, 0.25, 0.1, 0]
-    points_insiders = np.vstack((x, y)).T
+    points_insiders = np.vstack((x1, y1)).T
     X, Y, density_grid = create_density_grid(points_insiders, grid_size, c=0.5)
     levels = find_contour_levels(density_grid, percentages)
     
@@ -159,8 +186,18 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
         THETA = (azimuth_betha - azimuth_alpha + 180) % 360 - 180 #all
         # R = np.where(vel0>0,vel1 / vel0,np.nan) # if vel0 > 0 else 0
         # R = np.where((R <= 3)&(R > 0.0),R,np.nan) #correction for outliers and non-drifting icebergs
-        R = np.where(distance0>0,distance1 / distance0,np.nan) # if vel0 > 0 else 0
-        R = np.where((R <= RLIM)&(R > 0.0),R,np.nan) #correction for outliers and non-drifting icebergs
+        # R = np.where(distance0>0,distance1 / distance0,np.nan) # if vel0 > 0 else 0
+        # R = np.where((R <= RLIM)&(R > 0.0),R,np.nan) #correction for outliers and non-drifting icebergs
+        #subset for valid R only
+        #subset for valid R only
+        R = np.where(distance0>0,distance1 / distance0,np.nan)
+        R = np.where((R!=0.0) & (R<RLIM),R,np.nan)
+        THETA = np.where(np.isnan(R)==False,THETA,np.nan)
+        print('Checks:', R.shape, np.any(R==0), np.nanmax(R), np.nanmax(THETA), R_perc.shape, np.nanmin(R_perc), np.nanmin(THETA_perc), np.nanmax(R_perc), np.nanmax(THETA_perc))
+        #apply percentiles
+        R10,R90 = np.nanpercentile(R, [10, 90])
+        R_perc, THETA_perc =  np.where(R<R90,R,np.nan), np.where(R<R90,THETA,np.nan)
+
         
         # #average meassures (incl outisders):
         # r_avg_with_outsiders = np.nanmean(R)
@@ -178,19 +215,28 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
         #     np.pi / 2 - np.radians(theta_avg_insiders), r_avg_insiders)
         # means_save[run.item()] = [r_avg_insiders,theta_avg_insiders]
         # insiders and means (new)
-        x, y = polar_to_cartesian(np.pi / 2 - np.radians(THETA[R <= RLIM]), R[R <= RLIM]) #used in scatterplot
-        x_insiders = np.mean(x)
-        y_insiders = np.mean(y)
+        # x, y = polar_to_cartesian(np.pi / 2 - np.radians(THETA[R <= RLIM]), R[R <= RLIM]) #used in scatterplot
+        x, y = polar_to_cartesian(np.pi / 2 - np.radians(THETA_perc),R_perc) #used in scatterplot, subset done above
+        x_insiders = np.nanmean(x)
+        y_insiders = np.nanmean(y)
         r_avg_insiders = np.sqrt(x_insiders**2 + y_insiders**2)     # r_avg_insiders_all = np.mean(R[R <= 3])
         theta_plot = np.arctan2(y_insiders, x_insiders)
         theta_avg_insiders = np.degrees(np.pi/2 - theta_plot)
         theta_avg_insiders = (theta_avg_insiders + 180) % 360 - 180
-        means_save[run.item()] = [np.round(vals,2) for vals in (r_avg_insiders,theta_avg_insiders)]
-        spread_save[run.item()] = [np.round(vals,2)
-                                   for vals in (np.nanmax(R) - np.nanmin(R),
-                                                np.nanpercentile(R, 90) - np.nanpercentile(R, 10),
-                                                np.nanmax(THETA) - np.nanmin(THETA),
-                                                np.nanpercentile(THETA, 90) - np.nanpercentile(THETA, 10))] #range as in max-min and IQR range (from 90 to 10%)
+
+        #save
+        r_mean2[run.item()],theta_mean2[run.item()] = np.round(np.nanmean(R_perc),2), np.round(np.nanmean(THETA_perc),2)
+        r_mean[run.item()],theta_mean[run.item()] = np.round(r_avg_insiders,2), np.round(theta_avg_insiders,2)
+        r_min[run.item()],r_max[run.item()],theta_min[run.item()],theta_max[run.item()] = np.round(R10,2),np.round(R90,2),np.round(np.nanpercentile(THETA, 10),2),np.round(np.nanpercentile(THETA, 90),2)
+        n_save[run.item()]= R.size
+        # spread_save[run.item()] = [np.round(vals,2)
+        #                            for vals in (np.nanmax(R) - np.nanmin(R),
+        #                                         np.nanpercentile(R, 90) - np.nanpercentile(R, 10),
+        #                                         np.nanmax(THETA) - np.nanmin(THETA),
+        #                                         np.nanpercentile(THETA, 90) - np.nanpercentile(THETA, 10))] #range as in max-min and IQR range (from 90 to 10%)
+        r_spread_ts[run.item()] = np.nanpercentile(R, 90,axis=0) - np.nanpercentile(R, 10,axis=0)
+        theta_spread_ts[run.item()] = np.nanpercentile(THETA, 90,axis=0) - np.nanpercentile(THETA, 10,axis=0)
+        print('Results checks',R.shape, r_spread_ts[run.item()].shape)
     
         ax.scatter(
             x, y, alpha=legenddict[run]['alpha'], marker="v", color=col_run, edgecolor="k", zorder=legenddict[run]['zo'],
@@ -285,7 +331,10 @@ def polarplot_m(sim_in,obs_in,legenddict,RLIM=10,
         
     if save!=False: plt.savefig('./results/analysis_polarplot_%s.png'%(save), bbox_inches="tight", dpi=400)
     plt.show()
-    return {'mean':means_save,'spread':spread_save}
+    return {'r_mean':r_mean,'theta_mean':theta_mean,
+            'r_mean2':r_mean2,'theta_mean2':theta_mean2,
+            'r_min':r_min,'r_max':r_max,'theta_min':theta_min,'theta_max':theta_max,'n':n_save,
+           'r_spread_ts':r_spread_ts,'theta_spread_ts':theta_spread_ts}
 
 from scipy.spatial.distance import pdist
 
@@ -331,7 +380,7 @@ def calculate_average_distance(points):
         distances = pdist(points[::50])
     else:
         distances = pdist(points)
-    d_avg = np.mean(distances)
+    d_avg = np.nanmean(distances)
     return d_avg
     
 def gaussian_kernel(r, sigma):
