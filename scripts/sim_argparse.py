@@ -56,6 +56,7 @@ openbergvers = args.argopenberg
 if openbergvers=='orig': from openberg_july2026.src2.openberg_orig import OpenBerg
 elif openbergvers=='lia': from openberg_july2026.src2.openberg_lia import OpenBerg
 elif openbergvers=='lia2': from openberg_july2026.src2.openberg_lia2 import OpenBerg
+elif openbergvers=='waveshovon': from openberg_july2026.src2.openberg_waveshovon import OpenBerg
 print('Openberg.py used from ',args.argopenberg)
 
 
