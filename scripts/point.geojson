@@ -1,0 +1,18 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "datetime": "2026-09-11T08:21:12.862463Z"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -29.18724,
+          66.87652
+        ]
+      }
+    }
+  ]
+}
